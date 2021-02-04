@@ -5,8 +5,226 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PDL4"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Patent Downloader 4.0" Height="600" Width="600">
+    
+    <Grid >
+        <Grid.RowDefinitions>
+            <!-- Border -->
+            <RowDefinition Height="10"/>
+            <!-- Controls header-->
+            <RowDefinition Height="100" />
+            <!-- Download output and controls -->
+            <RowDefinition Height="*"/>
+            <!-- Border -->
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
         
+        <Grid.ColumnDefinitions>
+            <!-- Border -->
+            <ColumnDefinition Width="25"/>
+            <!-- Content Body -->
+            <ColumnDefinition Width="*"/>
+            <!-- Border -->
+            <ColumnDefinition Width="25"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Controls and logo header -->
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <!-- Load file button -->
+                <ColumnDefinition Width="100" />
+                <!-- Info text output area -->
+                <ColumnDefinition Width="*" />
+                <!-- Download Controls -->
+                <ColumnDefinition Width="100" />
+                <!-- Logo -->
+                <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Grid.Row="0" Content="Load File"
+                    Margin="5, 20"/>
+
+            <!-- Info text container -->
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <!-- Border -->
+                    <ColumnDefinition Width="5" />
+                    <!-- Content -->
+                    <ColumnDefinition Width="*" />
+                    <!-- Border -->
+                    <ColumnDefinition Width="5" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <!-- Border -->
+                    <RowDefinition Height="20" />
+                    <!-- File Info -->
+                    <RowDefinition Height="*" />
+                    <!-- Middle Border -->
+                    <RowDefinition Height="10" />
+                    <!-- Patent number -->
+                    <RowDefinition Height="*" />
+                    <!-- Border -->
+                    <RowDefinition Height="20" />
+                </Grid.RowDefinitions>
+
+                <!-- Info text output -->
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="Once a file is selected it will appear here" 
+                           VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="Number of distinct patents: None selected" 
+                           VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- Start/Reset/Stop buttons -->
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <!-- Border -->
+                    <ColumnDefinition Width="5" />
+                    <!-- Reset Column -->
+                    <ColumnDefinition Width="*" />
+                    <!-- Stop Column -->
+                    <ColumnDefinition Width="*" />
+                    <!-- Border -->
+                    <ColumnDefinition Width="5" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <!-- Border -->
+                    <RowDefinition Height="15" />
+                    <!-- Start Button -->
+                    <RowDefinition Height="40" />
+                    <!-- Reset/Stop Buttons -->
+                    <RowDefinition Height="*" />
+                    <!-- Border -->
+                    <RowDefinition Height="15" />
+                </Grid.RowDefinitions>
+                
+                <!-- Start button -->
+                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Content="Start" 
+                        Margin="5"/>
+                <!-- Reset button -->
+                <Button Grid.Row="2" Grid.Column="1" Content="Reset" 
+                        Margin="5"/>
+                <!-- Stop button -->
+                <Button Grid.Row="2" Grid.Column="2" Content="Stop" 
+                        Margin="5"/>
+                
+            </Grid>
+
+            <!-- Logo -->
+            <Image Grid.Column="3" Source="Images/shorechan.png" />
+
+        </Grid>
+
+        <!-- Download output and controls -->
+        <Grid Grid.Row="2" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <!-- Lists and controls -->
+                <RowDefinition Height="*" />
+                <!-- Progress bar -->
+                <RowDefinition Height="25" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <!-- Successful downloads list-->
+                <ColumnDefinition Width="*" />
+                <!-- Successful controls -->
+                <ColumnDefinition Width="80" />
+                <!-- Failed downloads list -->
+                <ColumnDefinition Width="*" />
+                <!-- Failed controls -->
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Successful downloads region -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <!-- Header -->
+                    <RowDefinition Height="15" />
+                    <!-- Listview -->
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Successful downloads" />
+
+                <ListView Grid.Row="1" Margin="5"></ListView>
+            </Grid>
+
+            <!-- Successful downloads controls -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <!-- Top border -->
+                    <RowDefinition Height="25" />
+                    <!-- Export button -->
+                    <RowDefinition Height="25" />
+                    <!-- Bottom fill -->
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Export button -->
+                <Button Grid.Row="1" Content="Export" 
+                        Margin="5 3"/>
+            </Grid>
+
+            <!-- Failed downloads region -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <!-- Header -->
+                    <RowDefinition Height="15" />
+                    <!-- Listview -->
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Failed downloads" />
+
+                <ListView Grid.Row="1" Margin="5"></ListView>
+            </Grid>
+
+            <!-- Failed downloads controls -->
+            <Grid Grid.Column="3">
+                <Grid.RowDefinitions>
+                    <!-- Top border -->
+                    <RowDefinition Height="25" />
+                    <!-- Export button -->
+                    <RowDefinition Height="25" />
+                    <!-- Bottom fill -->
+                    <RowDefinition Height="*" />
+                    <!-- Export All button -->
+                    <RowDefinition Height="25" />
+                    <!-- Bottom border -->
+                    <RowDefinition Height="10" />
+                </Grid.RowDefinitions>
+
+                <!-- Export button -->
+                <Button Grid.Row="1" Content="Export" 
+                        Margin="5 3"/>
+
+                <!-- Export All button -->
+                <Button Grid.Row="3" Content="Export All" 
+                        Margin="5 3"/>
+
+            </Grid>
+
+            <!-- Progress bar region -->
+            <Grid Grid.Row="1" Grid.ColumnSpan="4">
+                <Grid.ColumnDefinitions>
+                    <!-- Status output -->
+                    <ColumnDefinition Width="80" />
+                    <!-- Bar control -->
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Status text -->
+                <TextBlock Text="Select File" VerticalAlignment="Center" 
+                           HorizontalAlignment="Center"/>
+                
+                <!-- The progress bar control -->
+                <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" />
+
+            </Grid>
+            
+        </Grid>
+
     </Grid>
+    
 </Window>
