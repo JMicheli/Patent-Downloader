@@ -21,13 +21,13 @@ namespace PDL4.DataModels
     {
         #region Public Properties
 
-        public PatentTimeline Status { get; private set; }
+        public PatentTimeline Timeline { get; private set; }
 
-        public string StatusString
+        public string TimelineString
         {
             get
             {
-                switch(Status)
+                switch(Timeline)
                 {
                     case PatentTimeline.None:
                         return "None";
@@ -47,7 +47,7 @@ namespace PDL4.DataModels
 
         public PatentStatus()
         {
-            Status = PatentTimeline.None;
+            Timeline = PatentTimeline.None;
         }
 
         #endregion

@@ -16,13 +16,10 @@ namespace PDL4.Models
     {
         #region Private Members
 
-        private List<PatentData> mPatentList = null;
+        private Dictionary<PatentData, PatentStatus> mPatentDictionary = null;
 
         private string mOpenFilePath = null;
         private string mOpenFileName = null;
-
-        private List<PatentData> mSuccessfulList;
-        private List<PatentData> mFailedList;
 
         private WebClient mClient;
 
@@ -30,15 +27,25 @@ namespace PDL4.Models
 
         #region Public Properties
 
-        public List<PatentData> PatentList { get { return mPatentList; } }
+        public List<PatentData> PatentList {
+            get
+            {
+                if (mPatentDictionary != null)
+                {
+                    return mPatentDictionary.Select(pair => pair.Key).ToList();
+                }
+
+                return null;
+            }
+        }
 
         public string OpenFilePathString { get { return mOpenFilePath; } }
         public string OpenFileNameString { get { return mOpenFileName; } }
 
         public string OpenFileDirectoryString { get { return Path.GetDirectoryName(mOpenFilePath) +@"\"; } } //Probably only works on Windows
 
-        public List<PatentData> SuccessfulList { get { return PatentList; } } //TEMPORARY: We'll want to change this to just log successes later
-        public List<PatentData> FailedList { get { return mFailedList; } }
+        public List<PatentData> SuccessfulList { get { return GetPatentsByTimeline(PatentTimeline.None); } } //TEMPORARY: We'll want to change this to just log successes later
+        public List<PatentData> FailedList { get { return GetPatentsByTimeline(PatentTimeline.Failed); } }
 
         #endregion
 
@@ -59,7 +66,7 @@ namespace PDL4.Models
             //Still check if a file is loaded to avoid unnecessary looping
             if (!(mOpenFilePath == null))
             {
-                foreach (PatentData p in mPatentList)
+                foreach (PatentData p in PatentList)
                     DownloadToLocation(p, location);
             }
         }
@@ -70,27 +77,32 @@ namespace PDL4.Models
             mOpenFileName = Path.GetFileName(path);
             string[] contents = File.ReadAllLines(mOpenFilePath);
 
-            //Build a new PatentData List object
+            //Start a fresh dictionary
+            mPatentDictionary = new Dictionary<PatentData, PatentStatus>();
+
+            //Create a List<PatentData> to hold our patents and reduce
             List<PatentData> nl = new List<PatentData>();
             foreach (string str in contents)
             {
                 PatentData p = GetPatentFromString(str);
                 nl.Add(p);
             }
+            nl = RemoveDuplicates(nl);
 
-            mPatentList = RemoveDuplicates(nl);
+            //Build new <PatentData, PatentStatus> Dictionary entries
+            foreach (PatentData p in nl)
+            {
+                PatentStatus s = new PatentStatus();
+                mPatentDictionary.Add(p, s);
+            }
         }
 
         public void Reset()
         {
             //Null member variables
-            mPatentList = null;
+            mPatentDictionary = null;
             mOpenFilePath = null;
             mOpenFileName = null;
-
-            //Reset success lists
-            mSuccessfulList = new List<PatentData>();
-            mFailedList = new List<PatentData>();
         }
 
         #endregion
@@ -99,9 +111,6 @@ namespace PDL4.Models
 
         public PDLAppModel()
         {
-            mSuccessfulList = new List<PatentData>();
-            mFailedList = new List<PatentData>();
-
             //Get a WebClient we'll use for downloads
             mClient = new WebClient();
         }
@@ -168,6 +177,24 @@ namespace PDL4.Models
             }
 
             return p;
+        }
+
+        private List<PatentData> GetPatentsByTimeline(PatentTimeline t)
+        {
+            //Catch nulls
+            if (mPatentDictionary == null)
+                return null;
+
+            //New list
+            List<PatentData> ol = new List<PatentData>();
+
+            foreach (KeyValuePair<PatentData, PatentStatus> kvp in mPatentDictionary)
+            {
+                if (kvp.Value.Timeline == t)
+                    ol.Add(kvp.Key);
+            }
+
+            return ol;
         }
 
         //  NOTE: THIS IS WHAT NEEDS TO BE REPLACED WHEN DOWNLOADING BREAKS
