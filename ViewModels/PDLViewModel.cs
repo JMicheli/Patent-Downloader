@@ -106,7 +106,8 @@ namespace PDL4.ViewModels
 
         private void Start_Click()
         {
-            //Use this for testing or something I guess
+            PatentData patent = mAppModel.PatentList[0];
+            mAppModel.DownloadToLocation(patent, mAppModel.OpenFileDirectoryString);
         }
 
         private void Reset_Click()
