@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PDL4"
         mc:Ignorable="d"
+        Icon="Images/Favicon/favicon.png"
+        ResizeMode="NoResize"
         Title="Patent Downloader 4.0" Height="600" Width="600">
     
     <Grid >
@@ -41,8 +43,8 @@
                 <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Grid.Row="0" Content="Load File"
-                    Margin="5, 20"/>
+            <Button Grid.Column="0" Grid.Row="0" Content="Load File" Margin="5, 20"
+                    Command="{Binding LoadFileCommand}"/>
 
             <!-- Info text container -->
             <Grid Grid.Column="1">
@@ -69,9 +71,9 @@
                 </Grid.RowDefinitions>
 
                 <!-- Info text output -->
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="Once a file is selected it will appear here" 
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedFile, FallbackValue='Once a file is selected it will appear here'}" 
                            VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="Number of distinct patents: None selected" 
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DistinctPatentsString, FallbackValue='Currently open: None loaded'}" 
                            VerticalAlignment="Center"/>
             </Grid>
 
@@ -100,14 +102,14 @@
                 </Grid.RowDefinitions>
                 
                 <!-- Start button -->
-                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Content="Start" 
-                        Margin="5"/>
+                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Content="Start" Margin="5"
+                        Command="{Binding StartCommand}" />
                 <!-- Reset button -->
-                <Button Grid.Row="2" Grid.Column="1" Content="Reset" 
-                        Margin="5"/>
+                <Button Grid.Row="2" Grid.Column="1" Content="Reset" Margin="5"
+                        Command="{Binding ResetCommand}" />
                 <!-- Stop button -->
-                <Button Grid.Row="2" Grid.Column="2" Content="Stop" 
-                        Margin="5"/>
+                <Button Grid.Row="2" Grid.Column="2" Content="Stop" Margin="5"
+                        Command="{Binding StopCommand}" />
                 
             </Grid>
 
@@ -147,7 +149,8 @@
 
                 <TextBlock Grid.Row="0" Text="Successful downloads" />
 
-                <ListView Grid.Row="1" Margin="5"></ListView>
+                <ListView Grid.Row="1" Margin="5"
+                          ItemsSource="{Binding SuccessfulDownloads}"></ListView>
             </Grid>
 
             <!-- Successful downloads controls -->
@@ -177,7 +180,8 @@
 
                 <TextBlock Grid.Row="0" Text="Failed downloads" />
 
-                <ListView Grid.Row="1" Margin="5"></ListView>
+                <ListView Grid.Row="1" Margin="5"
+                          ItemsSource="{Binding FailedDownloads}"></ListView>
             </Grid>
 
             <!-- Failed downloads controls -->
