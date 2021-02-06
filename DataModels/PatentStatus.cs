@@ -21,7 +21,7 @@ namespace PDL4.DataModels
     {
         #region Public Properties
 
-        public PatentTimeline Timeline { get; private set; }
+        public PatentTimeline Timeline { get; set; }
 
         public string TimelineString
         {

@@ -14,7 +14,9 @@
  * 5) Make sure the download url generation works for foreign patents as well
  *      a) Could necessitate changes to the way an initial input string is parsed
  * 6) Consider adding user-selected download paths instead of targeting the same directory as the input source
- * 7) Change patent list to a dictionary matching data to statuses so that we can do error logging later
+ * *) Change patent list to a dictionary matching data to statuses so that we can do error logging later [DONE]
  * 8) Develop error logging system to generate logs for me in case of errors
+ * 9) Add support for multiple files at a later point
+ *      a) This probably calls for some changes around the idea of the "open file" being the last one selected
  * 
  */

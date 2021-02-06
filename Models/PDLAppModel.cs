@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using System.Linq;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
+
+using HtmlAgilityPack;
 
 using PDL4.DataModels;
-using System.Text.RegularExpressions;
-using System.Net;
-using HtmlAgilityPack;
 
 namespace PDL4.Models
 {
@@ -16,59 +16,44 @@ namespace PDL4.Models
     {
         #region Private Members
 
-        private Dictionary<PatentData, PatentStatus> mPatentDictionary = null;
+        private Dictionary<PatentData, PatentStatus> mPatentDictionary;
 
         private string mOpenFilePath = null;
         private string mOpenFileName = null;
 
-        private WebClient mClient;
-
         #endregion
 
         #region Public Properties
-
-        public List<PatentData> PatentList {
-            get
-            {
-                if (mPatentDictionary != null)
-                {
-                    return mPatentDictionary.Select(pair => pair.Key).ToList();
-                }
-
-                return null;
-            }
-        }
 
         public string OpenFilePathString { get { return mOpenFilePath; } }
         public string OpenFileNameString { get { return mOpenFileName; } }
 
         public string OpenFileDirectoryString { get { return Path.GetDirectoryName(mOpenFilePath) +@"\"; } } //Probably only works on Windows
 
-        public List<PatentData> SuccessfulList { get { return GetPatentsByTimeline(PatentTimeline.None); } } //TEMPORARY: We'll want to change this to just log successes later
+        public List<PatentData> UnprocessedList { get { return GetPatentsByTimeline(PatentTimeline.None); } }
+        public List<PatentData> SuccessfulList { get { return GetPatentsByTimeline(PatentTimeline.Succeeded); } }
         public List<PatentData> FailedList { get { return GetPatentsByTimeline(PatentTimeline.Failed); } }
+
+        public List<PatentData> PatentList
+        {
+            get
+            {
+                return mPatentDictionary.Select(pair => pair.Key).ToList();
+            }
+        }
 
         #endregion
 
         #region Public Functions
 
-        public void DownloadToLocation(PatentData patent, string location)
+        public void DownloadSingle(PatentData patent)
         {
-            //Don't do it if we have no file open, consider changing later
-            if (!(mOpenFilePath == null))
-            {
-                string file_name = OpenFileDirectoryString + patent.CondensedTitle + ".pdf";
-                mClient.DownloadFile(GetPatentDownloadURL(patent), file_name);
-            }
+         
         }
 
-        public void FullListDownload(string location)
+        public void DownloadAll()
         {
-            //Still check if a file is loaded to avoid unnecessary looping
-            if (!(mOpenFilePath == null))
-            {
-                foreach (PatentData p in PatentList)
-                    DownloadToLocation(p, location);
-            }
+         
         }
 
         public void LoadFile(string path)
@@ -77,7 +62,7 @@ namespace PDL4.Models
             mOpenFileName = Path.GetFileName(path);
             string[] contents = File.ReadAllLines(mOpenFilePath);
 
-            //Start a fresh dictionary
+            //New dictionary
             mPatentDictionary = new Dictionary<PatentData, PatentStatus>();
 
             //Create a List<PatentData> to hold our patents and reduce
@@ -87,7 +72,7 @@ namespace PDL4.Models
                 PatentData p = GetPatentFromString(str);
                 nl.Add(p);
             }
-            nl = RemoveDuplicates(nl);
+            RemoveDuplicates(ref nl);
 
             //Build new <PatentData, PatentStatus> Dictionary entries
             foreach (PatentData p in nl)
@@ -99,8 +84,9 @@ namespace PDL4.Models
 
         public void Reset()
         {
+            //New dictionary
+            mPatentDictionary = new Dictionary<PatentData, PatentStatus>();
             //Null member variables
-            mPatentDictionary = null;
             mOpenFilePath = null;
             mOpenFileName = null;
         }
@@ -111,13 +97,36 @@ namespace PDL4.Models
 
         public PDLAppModel()
         {
-            //Get a WebClient we'll use for downloads
-            mClient = new WebClient();
+            //Create fresh Dictionary<PatentData, PatentStatus> to hold our list
+            mPatentDictionary = new Dictionary<PatentData, PatentStatus>();
         }
 
         #endregion
 
         #region Private Fns
+
+        //  NOTE: THIS IS WHAT NEEDS TO BE REPLACED WHEN DOWNLOADING BREAKS
+        /// <summary>
+        /// Creates a url to Google Patents' PDF scan of a given patent
+        /// based on the current setup of their page.
+        /// </summary>
+        /// <param name="patent">The patent to collect a URL for</param>
+        /// <returns>string containing url to PDF target</returns>
+        private string GetPatentDownloadURL(PatentData patent)
+        {
+            string pg_url = "https://patents.google.com/patent/" + patent.CondensedTitle;
+
+            //Rip Google Patents page
+            var pg_doc = new HtmlWeb().Load(pg_url);
+            //Grab the <meta name="citation_pdf_url"> tag where we expect to find the PDF url
+            //Note: We only expect one tag but this code doesn't forbid multiple
+            var meta_tags = pg_doc.DocumentNode.Descendants("meta").Where(node => node.OuterHtml.Contains("citation_pdf_url"));
+            //We'll take the first tag (in case of multiple)
+            HtmlNode n = meta_tags.First();
+
+            //Grab the content from the appropriate node <meta content="x">
+            return n.GetAttributeValue("content", "");
+        }
 
         private PatentData GetPatentFromString(string input)
         {
@@ -156,37 +165,30 @@ namespace PDL4.Models
             return new PatentData(cc, gn);
         }
 
-        private List<PatentData> RemoveDuplicates(List<PatentData> initial)
-        {
-            List<PatentData> p = initial;
-            
+        private void RemoveDuplicates(ref List<PatentData> list)
+        {   
             PatentData cur = null;
-            int count = p.Count;
+            int count = list.Count;
             for (int i = 0; i < count; i++)
             {
-                cur = p[i];
+                cur = list[i];
 
                 for (int j = i + 1; j < count; j++)
                 {
-                    if (p[j].FormattedTitle == cur.FormattedTitle)
+                    if (list[j].FormattedTitle == cur.FormattedTitle)
                     {
-                        p.RemoveAt(j);
+                        list.RemoveAt(j);
                         count--;
                     }
                 }
             }
-
-            return p;
         }
 
         private List<PatentData> GetPatentsByTimeline(PatentTimeline t)
         {
-            //Catch nulls
-            if (mPatentDictionary == null)
-                return null;
-
             //New list
             List<PatentData> ol = new List<PatentData>();
+
 
             foreach (KeyValuePair<PatentData, PatentStatus> kvp in mPatentDictionary)
             {
@@ -195,29 +197,6 @@ namespace PDL4.Models
             }
 
             return ol;
-        }
-
-        //  NOTE: THIS IS WHAT NEEDS TO BE REPLACED WHEN DOWNLOADING BREAKS
-        /// <summary>
-        /// Creates a url to Google Patents' PDF scan of a given patent
-        /// based on the current setup of their page.
-        /// </summary>
-        /// <param name="patent">The patent to collect a URL for</param>
-        /// <returns>string containing url to PDF target</returns>
-        private string GetPatentDownloadURL(PatentData patent)
-        {
-            string pg_url = "https://patents.google.com/patent/" + patent.CondensedTitle;
-
-            //Rip Google Patents page
-            var pg_doc = new HtmlWeb().Load(pg_url);
-            //Grab the <meta name="citation_pdf_url"> tag where we expect to find the PDF url
-            //Note: We only expect one tag but this code doesn't forbid multiple
-            var meta_tags = pg_doc.DocumentNode.Descendants("meta").Where(node => node.OuterHtml.Contains("citation_pdf_url"));
-            //We'll take the first tag (in case of multiple)
-            HtmlNode n = meta_tags.First();
-            
-            //Grab the content from the appropriate node <meta content="x">
-            return n.GetAttributeValue("content", "");
         }
 
         #endregion

@@ -44,7 +44,7 @@ namespace PDL4.ViewModels
         {
             get
             {
-                if (mAppModel.PatentList != null)
+                if (mAppModel.PatentList.Count > 0)
                     return DistinctPatentsPrefix + mAppModel.PatentList.Count.ToString();
                 else
                     return DistinctPatentsPrefix + "None loaded";
@@ -55,6 +55,11 @@ namespace PDL4.ViewModels
         public List<PatentData> SuccessfulDownloads { get { return mAppModel.SuccessfulList; } }
 
         public List<PatentData> FailedDownloads { get { return mAppModel.FailedList; } }
+
+        //Button state calculations (check for both length of list and that it exists)
+        public bool SuccessfulExportEnabled { get { return (mAppModel.SuccessfulList.Count > 0); } }
+        public bool FailedExportEnabled { get { return (mAppModel.FailedList.Count > 0); } }
+        public bool ExportAllEnabled { get { return (mAppModel.SuccessfulList.Count > 0 || mAppModel.FailedList.Count > 0); } }
 
         #endregion
 
@@ -107,7 +112,7 @@ namespace PDL4.ViewModels
         private void Start_Click()
         {
             PatentData patent = mAppModel.PatentList[0];
-            mAppModel.DownloadToLocation(patent, mAppModel.OpenFileDirectoryString);
+            mAppModel.DownloadSingle(patent);
         }
 
         private void Reset_Click()
@@ -123,10 +128,16 @@ namespace PDL4.ViewModels
 
         private void NotifyAll()
         {
+            //Labels
             OnPropertyChanged(nameof(SelectedFile));
             OnPropertyChanged(nameof(DistinctPatentsString));
+            //Lists
             OnPropertyChanged(nameof(SuccessfulDownloads));
             OnPropertyChanged(nameof(FailedDownloads));
+            //Buttons
+            OnPropertyChanged(nameof(SuccessfulExportEnabled));
+            OnPropertyChanged(nameof(FailedExportEnabled));
+            OnPropertyChanged(nameof(ExportAllEnabled));
         }
 
         #endregion
