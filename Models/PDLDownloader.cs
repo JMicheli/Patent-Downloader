@@ -46,63 +46,14 @@ namespace PDL4.Models
         #region Public Functions
 
         //Does this need an update? I think it does.
-        public async void DownloadSingle(PatentData patent, string directory)
+        public void DownloadSingle(PatentData patent, string directory)
         {
-            WebClient c = new WebClient();
-            string url = GetPatentDownloadURL(patent);
-            string fname = directory + patent.CondensedTitle + ".pdf";
 
-            await c.DownloadFileTaskAsync(url, fname);
         }
 
+        //Gonna need to rewrite entirely. This isn't proper threading.
         public void DownloadAll(List<PatentData> patents, string directory)
         {
-            //Create queue objects
-            BlockingCollection<WebClient> client_queue = new BlockingCollection<WebClient>(MaxDownloadClients);
-            Queue<string> url_queue = new Queue<string>();
-
-            //Populate client_queue with appropriate number of WebClients
-            for (int i = 0; i < MaxDownloadClients; i++)
-            {
-                var cli = new WebClient();
-                //Inject code for thread to run on completion (defined below)
-                cli.DownloadFileCompleted += PatentDownloadCompleted;
-                client_queue.Add(cli);
-            }
-
-            //Perform download operation
-            for (int i = 0; i < patents.Count; i++)
-            {
-                //Grab a webclient off the queue (blocks if unavailable)
-                WebClient cli = client_queue.Take();
-
-                //Get download parameters
-                PatentData patent = patents[i];
-                string url = GetPatentDownloadURL(patent);
-                string fname = directory + patent.CondensedTitle + ".pdf";
-
-                if (url == null)
-                {
-                    DownloadFinished(patent, PatentTimeline.Failed);
-                    client_queue.Add(cli);
-                }
-                else
-                    cli.DownloadFileAsync(new Uri(url), fname, new PatentDownloadArgs(patent, cli));
-            }
-
-            //Internal method called when a WebClient completes a download
-            void PatentDownloadCompleted(object sender, AsyncCompletedEventArgs e)
-            {
-                PatentDownloadArgs args = (PatentDownloadArgs)e.UserState;
-
-                //Download finished callback
-                if (e.Error == null)
-                    DownloadFinished(args.Patent, PatentTimeline.Succeeded);
-                else
-                    DownloadFinished(args.Patent, PatentTimeline.Failed);
-
-                client_queue.Add(args.Client);
-            }
 
         }
 

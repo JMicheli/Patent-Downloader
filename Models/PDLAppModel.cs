@@ -45,6 +45,8 @@ namespace PDL4.Models
             }
         }
 
+        public int PatentsProcessed { get; private set; } = 0;
+
         public BasicCallback StateChangedCallback { get; set; }
 
         #endregion
@@ -61,6 +63,7 @@ namespace PDL4.Models
             mOpenFilePath = path;
             mOpenFileName = Path.GetFileName(path);
             string[] contents = File.ReadAllLines(mOpenFilePath);
+            PatentsProcessed = 0;
 
             //New dictionary
             mPatentDictionary = new Dictionary<PatentData, PatentStatus>();
@@ -89,6 +92,8 @@ namespace PDL4.Models
             //Null member variables
             mOpenFilePath = null;
             mOpenFileName = null;
+            //Set patents processed to zero
+            PatentsProcessed = 0;
         }
 
         #endregion
@@ -136,6 +141,7 @@ namespace PDL4.Models
             else
                 Console.WriteLine(patent.CondensedTitle + " failed");
 
+            PatentsProcessed += 1;
             StateChangedCallback();
         }
 

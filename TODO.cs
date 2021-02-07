@@ -1,6 +1,6 @@
 ﻿/*
  * Don't forget!
- * 1) Unfuck start button if I decide to use it for testing.
+ * 1) Currently the download all method won't properly update the progressbar to 100% if it isn't handling 100% of the patent list
  * 
  * 
  * Ongoing:

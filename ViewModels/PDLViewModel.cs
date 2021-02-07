@@ -61,6 +61,19 @@ namespace PDL4.ViewModels
         public bool FailedExportEnabled { get { return (mAppModel.FailedList.Count > 0); } }
         public bool ExportAllEnabled { get { return (mAppModel.SuccessfulList.Count > 0 || mAppModel.FailedList.Count > 0); } }
 
+        //Progress bar stuff
+        public int ProgressBarPercentage 
+        {
+            get
+            {
+                if (mAppModel.PatentList.Count <= 0)
+                    return 0;
+                else
+                    return (100 * mAppModel.PatentsProcessed / mAppModel.PatentList.Count); 
+            }
+            set { }
+        }
+
         #endregion
 
         #region Commands
@@ -86,6 +99,7 @@ namespace PDL4.ViewModels
             {
                 OnPropertyChanged(nameof(SuccessfulDownloads));
                 OnPropertyChanged(nameof(FailedDownloads));
+                OnPropertyChanged(nameof(ProgressBarPercentage));
             };
 
             //Create commands
@@ -145,6 +159,8 @@ namespace PDL4.ViewModels
             OnPropertyChanged(nameof(SuccessfulExportEnabled));
             OnPropertyChanged(nameof(FailedExportEnabled));
             OnPropertyChanged(nameof(ExportAllEnabled));
+            //Progress bar
+            OnPropertyChanged(nameof(ProgressBarPercentage));
         }
 
         #endregion
