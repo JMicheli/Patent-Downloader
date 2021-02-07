@@ -61,6 +61,17 @@ namespace PDL4.ViewModels
         public bool StartEnabled { get { return ((mAppModel.State == PDLAppState.Loaded) || (mAppModel.State == PDLAppState.Stopped)); } }
         public bool ResetEnabled { get { return !((mAppModel.State == PDLAppState.Initial) || (mAppModel.State == PDLAppState.Downloading)); } }
         public bool StopEnabled { get { return mAppModel.State == PDLAppState.Downloading; } }
+        //And the text for the start button
+        public string StartButtonText
+        {
+            get
+            {
+                if (mAppModel.State == PDLAppState.Stopped)
+                    return "Resume";
+                else
+                    return "Start";
+            }
+        }
 
         //List Button state calculations (check for both length of list and that it exists)
         public bool SuccessfulExportEnabled { get { return (mAppModel.SuccessfulList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
@@ -139,8 +150,10 @@ namespace PDL4.ViewModels
 
         private void Start_Click()
         {
-            PatentData patent = mAppModel.PatentList[0];
-            mAppModel.Download();
+            if (mAppModel.State == PDLAppState.Stopped)
+                mAppModel.Resume();
+            else
+                mAppModel.Download();
         }
 
         //Reset button to App Model reset
@@ -165,6 +178,7 @@ namespace PDL4.ViewModels
             OnPropertyChanged(nameof(StartEnabled));
             OnPropertyChanged(nameof(ResetEnabled));
             OnPropertyChanged(nameof(StopEnabled));
+            OnPropertyChanged(nameof(StartButtonText));
             //Progress bar
             OnPropertyChanged(nameof(ProgressBarPercentage));
         }

@@ -41,6 +41,9 @@ namespace PDL4.Models
 
         private BackgroundWorker mBackgroundWorker;
 
+        private List<PatentData> mResumeList;
+        private string mResumeDirectory;
+
         #endregion
 
         #region Public Properties
@@ -76,6 +79,11 @@ namespace PDL4.Models
         {
             if (mBackgroundWorker.IsBusy)
                 mBackgroundWorker.CancelAsync();
+        }
+
+        public void Resume()
+        {
+            Download(mResumeList, mResumeDirectory);
         }
 
         #endregion
@@ -144,7 +152,8 @@ namespace PDL4.Models
                 int total = download_request.Patents.Count;
 
                 //Process each patent in turn (can we make this have multiple simultaneous downloads
-                for (int i = 0; i < total; i++)
+                int i;
+                for (i = 0; i < total; i++)
                 {
                     //Check for cancellation
                     if (worker.CancellationPending)
@@ -176,7 +185,14 @@ namespace PDL4.Models
 
                 //Make appropriate callback based on why we're ending
                 if (worker.CancellationPending)
+                {
+                    //Store the remaining list for download resuming
+                    mResumeList = download_request.Patents;
+                    mResumeList.RemoveRange(0, i);
+                    mResumeDirectory = download_request.Directory;
+
                     DownloadHaltedCallback();
+                }  
                 else
                     DownloadFinishedCallback();
             }

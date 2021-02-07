@@ -103,7 +103,8 @@
                 </Grid.RowDefinitions>
                 
                 <!-- Start button -->
-                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Content="Start" Margin="5"
+                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
+                        Content="{Binding StartButtonText, FallbackValue='Start'}"
                         Command="{Binding StartCommand}" 
                         IsEnabled="{Binding StartEnabled}" />
                 <!-- Reset button -->

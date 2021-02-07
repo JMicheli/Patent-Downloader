@@ -128,6 +128,12 @@ namespace PDL4.Models
             mPatentDownloader.Halt();
         }
 
+        public void Resume()
+        {
+            mPatentDownloader.Resume();
+            State = PDLAppState.Downloading;
+        }
+
         #endregion
 
         #region Constructor
