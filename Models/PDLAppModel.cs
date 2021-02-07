@@ -45,7 +45,7 @@ namespace PDL4.Models
             }
         }
 
-        public int PatentsProcessed { get; private set; } = 0;
+        public int PatentsProcessedPercentage { get { return mPatentDownloader.DownloadProgressPercentage; } }
 
         public BasicCallback StateChangedCallback { get; set; }
 
@@ -54,16 +54,15 @@ namespace PDL4.Models
         #region Public Functions
 
         //Exposed download commands
-        public void Download(PatentData patent) { mPatentDownloader.DownloadSingle(patent, OpenFileDirectoryString); }
-        public void Download(List<PatentData> patents) { mPatentDownloader.DownloadAll(patents, OpenFileDirectoryString); }
-        public void Download() { mPatentDownloader.DownloadAll(PatentList, OpenFileDirectoryString); }
+        public void Download(PatentData patent) { mPatentDownloader.Download(patent, OpenFileDirectoryString); }
+        public void Download(List<PatentData> patents) { mPatentDownloader.Download(patents, OpenFileDirectoryString); }
+        public void Download() { mPatentDownloader.Download(PatentList, OpenFileDirectoryString); }
 
         public void LoadFile(string path)
         {
             mOpenFilePath = path;
             mOpenFileName = Path.GetFileName(path);
             string[] contents = File.ReadAllLines(mOpenFilePath);
-            PatentsProcessed = 0;
 
             //New dictionary
             mPatentDictionary = new Dictionary<PatentData, PatentStatus>();
@@ -93,7 +92,6 @@ namespace PDL4.Models
             mOpenFilePath = null;
             mOpenFileName = null;
             //Set patents processed to zero
-            PatentsProcessed = 0;
         }
 
         #endregion
@@ -107,7 +105,7 @@ namespace PDL4.Models
 
             //Grab a copy of the downloader to manage downloads
             mPatentDownloader = new PDLDownloader(5); //Maximum of 5 clients for now
-            mPatentDownloader.DownloadFinished = UpdatePatent;
+            mPatentDownloader.DownloadFinishedCallback = UpdatePatent;
         }
 
         #endregion
@@ -141,7 +139,6 @@ namespace PDL4.Models
             else
                 Console.WriteLine(patent.CondensedTitle + " failed");
 
-            PatentsProcessed += 1;
             StateChangedCallback();
         }
 

@@ -69,7 +69,7 @@ namespace PDL4.ViewModels
                 if (mAppModel.PatentList.Count <= 0)
                     return 0;
                 else
-                    return (100 * mAppModel.PatentsProcessed / mAppModel.PatentList.Count); 
+                    return mAppModel.PatentsProcessedPercentage; 
             }
             set { }
         }

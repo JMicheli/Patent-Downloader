@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 using HtmlAgilityPack;
 
@@ -15,15 +16,15 @@ namespace PDL4.Models
     {
         #region Private Classes
 
-        private class PatentDownloadArgs
+        private class DownloadRequest
         {
-            public readonly PatentData Patent;
-            public readonly WebClient Client;
+            public readonly List<PatentData> Patents;
+            public readonly string Directory;
 
-            public PatentDownloadArgs(PatentData patent, WebClient client)
+            public DownloadRequest(List<PatentData> patents, string directory)
             {
-                Patent = patent;
-                Client = client;
+                Patents = patents;
+                Directory = directory;
             }
         }
 
@@ -35,26 +36,38 @@ namespace PDL4.Models
 
         #endregion
 
+        #region Private Members
+
+        private BackgroundWorker mBackgroundWorker;
+
+        #endregion
+
         #region Public Properties
 
         public int MaxDownloadClients { private get; set; }
+        public int DownloadProgressPercentage { get; private set; } = 0;
 
-        public PatentDownloadFinished DownloadFinished { get; set; }
+        public PatentDownloadFinished DownloadFinishedCallback { get; set; }
+
 
         #endregion
 
         #region Public Functions
 
-        //Does this need an update? I think it does.
-        public void DownloadSingle(PatentData patent, string directory)
+        public void Download(List<PatentData> patents, string directory)
         {
-
+            //Encapsulate BackgroundWorker's data
+            var args = new DownloadRequest(patents, directory);
+            //Zero progress and set it running
+            DownloadProgressPercentage = 0;
+            mBackgroundWorker.RunWorkerAsync(args);
         }
 
-        //Gonna need to rewrite entirely. This isn't proper threading.
-        public void DownloadAll(List<PatentData> patents, string directory)
+        public void Download(PatentData patent, string directory)
         {
-
+            var patents = new List<PatentData>();
+            patents.Add(patent);
+            Download(patents, directory);
         }
 
         #endregion
@@ -64,6 +77,16 @@ namespace PDL4.Models
         public PDLDownloader(int max_clients)
         {
             MaxDownloadClients = max_clients;
+
+            //Set up background worker
+            mBackgroundWorker = new BackgroundWorker()
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            //Insert delegates
+            mBackgroundWorker.DoWork += worker_DownloadWork;
+            mBackgroundWorker.ProgressChanged += worker_ProgressChanged;
         }
 
         #endregion
@@ -101,5 +124,61 @@ namespace PDL4.Models
 
         #endregion
 
+        #region Background Worker
+
+        private void worker_DownloadWork(object sender, DoWorkEventArgs e)
+        {
+            //Catch defunct start requests
+            var download_request = e.Argument as DownloadRequest;
+            if (download_request != null)
+            {
+                //Set up variables prior to loop
+                BackgroundWorker worker = sender as BackgroundWorker;
+                WebClient client = new WebClient();
+                int total = download_request.Patents.Count;
+
+                //Process each patent in turn (can we make this have multiple simultaneous downloads
+                for (int i = 0; i < total; i++)
+                {
+                    //Check for cancellation
+                    if (worker.CancellationPending == true)
+                    {
+                        e.Cancel = true;
+                        break;
+                    }
+                    else
+                    {
+                        PatentData patent = download_request.Patents[i];
+
+                        string url = GetPatentDownloadURL(patent);
+                        string fname = download_request.Directory + patent.CondensedTitle + ".pdf";
+                        int progress = Convert.ToInt32(100 * (float)(i + 1) / (float)total);
+
+                        //Catch url failures
+                        if (url == null)
+                        {
+                            DownloadFinishedCallback(patent, PatentTimeline.Failed);
+                            worker.ReportProgress(progress);
+                            continue;
+                        }
+
+                        client.DownloadFile(url, fname);
+                        DownloadFinishedCallback(patent, PatentTimeline.Succeeded);
+                        worker.ReportProgress(progress);
+                    }
+                }
+            }
+        }
+
+        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            DownloadProgressPercentage = e.ProgressPercentage;
+        }
+
+        #endregion
     }
+
+
+
+
 }
