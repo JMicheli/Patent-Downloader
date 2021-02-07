@@ -33,6 +33,7 @@ namespace PDL4.Models
         #region Delegates
 
         public delegate void PatentDownloadFinished(PatentData patent, PatentTimeline time);
+        public delegate void BasicCallback();
 
         #endregion
 
@@ -44,10 +45,11 @@ namespace PDL4.Models
 
         #region Public Properties
 
-        public int MaxDownloadClients { private get; set; }
         public int DownloadProgressPercentage { get; private set; } = 0;
 
-        public PatentDownloadFinished DownloadFinishedCallback { get; set; }
+        public PatentDownloadFinished DownloadProgressedCallback { get; set; }
+        public BasicCallback DownloadHaltedCallback { get; set; }
+        public BasicCallback DownloadFinishedCallback { get; set; }
 
 
         #endregion
@@ -70,14 +72,18 @@ namespace PDL4.Models
             Download(patents, directory);
         }
 
+        public void Halt()
+        {
+            if (mBackgroundWorker.IsBusy)
+                mBackgroundWorker.CancelAsync();
+        }
+
         #endregion
 
         #region Constructor
 
-        public PDLDownloader(int max_clients)
+        public PDLDownloader()
         {
-            MaxDownloadClients = max_clients;
-
             //Set up background worker
             mBackgroundWorker = new BackgroundWorker()
             {
@@ -141,7 +147,7 @@ namespace PDL4.Models
                 for (int i = 0; i < total; i++)
                 {
                     //Check for cancellation
-                    if (worker.CancellationPending == true)
+                    if (worker.CancellationPending)
                     {
                         e.Cancel = true;
                         break;
@@ -157,16 +163,22 @@ namespace PDL4.Models
                         //Catch url failures
                         if (url == null)
                         {
-                            DownloadFinishedCallback(patent, PatentTimeline.Failed);
+                            DownloadProgressedCallback(patent, PatentTimeline.Failed);
                             worker.ReportProgress(progress);
                             continue;
                         }
 
                         client.DownloadFile(url, fname);
-                        DownloadFinishedCallback(patent, PatentTimeline.Succeeded);
+                        DownloadProgressedCallback(patent, PatentTimeline.Succeeded);
                         worker.ReportProgress(progress);
                     }
                 }
+
+                //Make appropriate callback based on why we're ending
+                if (worker.CancellationPending)
+                    DownloadHaltedCallback();
+                else
+                    DownloadFinishedCallback();
             }
         }
 
