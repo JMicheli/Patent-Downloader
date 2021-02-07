@@ -112,6 +112,14 @@ namespace PDL4.Models
             State = PDLAppState.Loaded;
         }
 
+        public PatentStatus GetPatentStatus(PatentData patent)
+        {
+            if (mPatentDictionary.ContainsKey(patent))
+                return mPatentDictionary[patent];
+            else
+                return null;
+        }
+
         public void Reset()
         {
             //New dictionary

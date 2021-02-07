@@ -171,6 +171,7 @@
 
                 <!-- Export button -->
                 <Button Grid.Row="1" Content="Export" Margin="5 3"
+                        Command="{Binding ExportSuccessfulCommand}"
                         IsEnabled="{Binding SuccessfulExportEnabled}"/>
             </Grid>
 
@@ -206,10 +207,12 @@
 
                 <!-- Export button -->
                 <Button Grid.Row="1" Content="Export" Margin="5 3"
+                        Command="{Binding ExportFailedCommand}"
                         IsEnabled="{Binding FailedExportEnabled}" />
 
                 <!-- Export All button -->
                 <Button Grid.Row="3" Content="Export All" Margin="5 3"
+                        Command="{Binding ExportAllCommand}"
                         IsEnabled="{Binding ExportAllEnabled}" />
 
             </Grid>

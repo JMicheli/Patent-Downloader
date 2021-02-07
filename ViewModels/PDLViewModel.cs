@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -101,6 +102,10 @@ namespace PDL4.ViewModels
         public ICommand ResetCommand { get; set; }
         public ICommand StopCommand  { get; set; }
 
+        public ICommand ExportSuccessfulCommand { get; set; }
+        public ICommand ExportFailedCommand     { get; set; }
+        public ICommand ExportAllCommand        { get; set; }
+
         #endregion
 
         #region Constructor
@@ -123,9 +128,13 @@ namespace PDL4.ViewModels
             //Create commands
             LoadFileCommand = new RelayCommand(() => LoadFile_Click());
 
-            StartCommand = new RelayCommand(() => Start_Click());
-            ResetCommand = new RelayCommand(() => Reset_Click());
-            StopCommand  = new RelayCommand(() => Stop_Click());
+            StartCommand = new RelayCommand(Start_Click);
+            ResetCommand = new RelayCommand(Reset_Click);
+            StopCommand = new RelayCommand(Stop_Click);
+
+            ExportSuccessfulCommand = new RelayCommand(() => { Export_Click(mAppModel.SuccessfulList, "Successful.txt"); });
+            ExportFailedCommand     = new RelayCommand(() => { Export_Click(mAppModel.FailedList, "Failed.txt"); });
+            ExportAllCommand        = new RelayCommand(() => { Export_Click(mAppModel.PatentList, "All.txt"); });
         }
 
         #endregion
@@ -137,14 +146,15 @@ namespace PDL4.ViewModels
             //Create dialog and set variables
             OpenFileDialog load_diag = new OpenFileDialog();
             load_diag.DefaultExt = ".txt";
+            load_diag.Title = "Load a list of patents";
             load_diag.Filter = "Text documents (.txt)|*.txt";
             //load_diag.Multiselect = true;
 
-            if (load_diag.ShowDialog() == true) //Fires if a file was selected
+            //Only continue if a file was selected
+            if (load_diag.ShowDialog() == true)
             {
                 mAppModel.LoadFile(load_diag.FileName); //Pass path into App Model
                 NotifyAll(); //Notify of changed properties
-                
             }
         }
 
@@ -158,8 +168,44 @@ namespace PDL4.ViewModels
 
         //Reset button to App Model reset
         private void Reset_Click() { mAppModel.Reset(); }
+
         //Stop button to App Model stop
         private void Stop_Click() { mAppModel.Stop(); }
+
+        private void Export_Click(List<PatentData> patents, string default_fname)
+        {
+            SaveFileDialog save_dialog = new SaveFileDialog();
+            save_dialog.DefaultExt = ".txt";
+            save_dialog.Title = "Save a list of results";
+            save_dialog.FileName = default_fname;
+            save_dialog.OverwritePrompt = true;
+            save_dialog.ValidateNames = true;
+
+            //Exit upon cancellation
+            if (save_dialog.ShowDialog() != true)
+                return;
+
+            //Prepare file contents
+            string[] lines = new string[patents.Count];
+            for (int i = 0; i < patents.Count; i++)
+            {
+                PatentData patent = patents[i];
+
+                lines[i] = patent.CondensedTitle;
+                PatentStatus status = mAppModel.GetPatentStatus(patent);
+                if (status.Timeline == PatentTimeline.None)
+                    lines[i] += " was not processed";
+                else if (status.Timeline == PatentTimeline.Succeeded)
+                    lines[i] += " was successfully downloaded";
+                else if (status.Timeline == PatentTimeline.Failed)
+                    lines[i] += " failed to download";
+                else
+                    lines[i] += " had an unknown error";
+            }
+
+            //Write contents to file
+            File.WriteAllLines(save_dialog.FileName, lines);
+        }
 
         private void NotifyAll()
         {
