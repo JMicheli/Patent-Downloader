@@ -44,7 +44,8 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Grid.Row="0" Content="Load File" Margin="5, 20"
-                    Command="{Binding LoadFileCommand}"/>
+                    Command="{Binding LoadFileCommand}"
+                    IsEnabled="{Binding LoadEnabled}"/>
 
             <!-- Info text container -->
             <Grid Grid.Column="1">
@@ -103,13 +104,16 @@
                 
                 <!-- Start button -->
                 <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Content="Start" Margin="5"
-                        Command="{Binding StartCommand}" />
+                        Command="{Binding StartCommand}" 
+                        IsEnabled="{Binding StartEnabled}" />
                 <!-- Reset button -->
                 <Button Grid.Row="2" Grid.Column="1" Content="Reset" Margin="5"
-                        Command="{Binding ResetCommand}" />
+                        Command="{Binding ResetCommand}"
+                        IsEnabled="{Binding ResetEnabled}" />
                 <!-- Stop button -->
                 <Button Grid.Row="2" Grid.Column="2" Content="Stop" Margin="5"
-                        Command="{Binding StopCommand}" />
+                        Command="{Binding StopCommand}"
+                        IsEnabled="{Binding StopEnabled}"/>
                 
             </Grid>
 

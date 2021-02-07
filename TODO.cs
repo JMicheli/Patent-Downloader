@@ -19,4 +19,7 @@
  * 9) Add support for multiple files at a later point
  *      a) This probably calls for some changes around the idea of the "open file" being the last one selected
  * 
+ * Maybe?
+ * 1) Consider re-combining the AppModel and Downloader into just the AppModel but make them partial classes for organization
+ *          a) Might be hard because of the callback communication they have now, but this seems like better MVVM
  */

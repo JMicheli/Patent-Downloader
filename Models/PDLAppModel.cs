@@ -7,6 +7,15 @@ using System;
 
 namespace PDL4.Models
 {
+    public enum PDLAppState
+    {
+        Initial,
+        Loaded,
+        Downloading,
+        Stopped,
+        Finished
+    }
+
     class PDLAppModel
     {
         #region Delegates
@@ -16,6 +25,8 @@ namespace PDL4.Models
         #endregion
 
         #region Private Members
+
+        private PDLAppState mState = PDLAppState.Initial;
 
         private Dictionary<PatentData, PatentStatus> mPatentDictionary;
 
@@ -27,6 +38,20 @@ namespace PDL4.Models
         #endregion
 
         #region Public Properties
+
+        public PDLAppState State
+        {
+            get
+            {
+                return mState;
+            }
+
+            set
+            {
+                mState = value;
+                StateChangedCallback();
+            }
+        }
 
         public string OpenFilePathString { get { return mOpenFilePath; } }
         public string OpenFileNameString { get { return mOpenFileName; } }
@@ -48,15 +73,16 @@ namespace PDL4.Models
         public int PatentsProcessedPercentage { get { return mPatentDownloader.DownloadProgressPercentage; } }
 
         public BasicCallback StateChangedCallback { get; set; }
+        public BasicCallback DownloadProgressCallback { get; set; }
 
         #endregion
 
         #region Public Functions
 
         //Exposed download commands
-        public void Download(PatentData patent) { mPatentDownloader.Download(patent, OpenFileDirectoryString); }
-        public void Download(List<PatentData> patents) { mPatentDownloader.Download(patents, OpenFileDirectoryString); }
-        public void Download() { mPatentDownloader.Download(PatentList, OpenFileDirectoryString); }
+        public void Download(PatentData patent) { mPatentDownloader.Download(patent, OpenFileDirectoryString); State = PDLAppState.Downloading; }
+        public void Download(List<PatentData> patents) { mPatentDownloader.Download(patents, OpenFileDirectoryString); State = PDLAppState.Downloading; }
+        public void Download() { mPatentDownloader.Download(PatentList, OpenFileDirectoryString); State = PDLAppState.Downloading; }
 
         public void LoadFile(string path)
         {
@@ -82,6 +108,8 @@ namespace PDL4.Models
                 PatentStatus s = new PatentStatus();
                 mPatentDictionary.Add(p, s);
             }
+
+            State = PDLAppState.Loaded;
         }
 
         public void Reset()
@@ -91,7 +119,13 @@ namespace PDL4.Models
             //Null member variables
             mOpenFilePath = null;
             mOpenFileName = null;
-            //Set patents processed to zero
+            //Set state back to initial
+            State = PDLAppState.Initial;
+        }
+
+        public void Stop()
+        {
+            State = PDLAppState.Stopped;
         }
 
         #endregion
@@ -104,8 +138,9 @@ namespace PDL4.Models
             mPatentDictionary = new Dictionary<PatentData, PatentStatus>();
 
             //Grab a copy of the downloader to manage downloads
-            mPatentDownloader = new PDLDownloader(5); //Maximum of 5 clients for now
-            mPatentDownloader.DownloadFinishedCallback = UpdatePatent;
+            mPatentDownloader = new PDLDownloader();
+            mPatentDownloader.DownloadProgressedCallback = UpdatePatent;
+            mPatentDownloader.DownloadFinishedCallback = () => { State = PDLAppState.Finished; };
         }
 
         #endregion
@@ -139,7 +174,7 @@ namespace PDL4.Models
             else
                 Console.WriteLine(patent.CondensedTitle + " failed");
 
-            StateChangedCallback();
+            DownloadProgressCallback();
         }
 
         private List<PatentData> GetPatentsByTimeline(PatentTimeline t)

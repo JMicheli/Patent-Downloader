@@ -56,10 +56,16 @@ namespace PDL4.ViewModels
 
         public List<PatentData> FailedDownloads { get { return mAppModel.FailedList; } }
 
-        //Button state calculations (check for both length of list and that it exists)
-        public bool SuccessfulExportEnabled { get { return (mAppModel.SuccessfulList.Count > 0); } }
-        public bool FailedExportEnabled { get { return (mAppModel.FailedList.Count > 0); } }
-        public bool ExportAllEnabled { get { return (mAppModel.SuccessfulList.Count > 0 || mAppModel.FailedList.Count > 0); } }
+        //Download control Button state calculations
+        public bool LoadEnabled { get { return !(mAppModel.State == PDLAppState.Downloading); } }
+        public bool StartEnabled { get { return ((mAppModel.State == PDLAppState.Loaded) || (mAppModel.State == PDLAppState.Stopped)); } }
+        public bool ResetEnabled { get { return !((mAppModel.State == PDLAppState.Initial) || (mAppModel.State == PDLAppState.Downloading)); } }
+        public bool StopEnabled { get { return mAppModel.State == PDLAppState.Downloading; } }
+
+        //List Button state calculations (check for both length of list and that it exists)
+        public bool SuccessfulExportEnabled { get { return (mAppModel.SuccessfulList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
+        public bool FailedExportEnabled { get { return (mAppModel.FailedList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
+        public bool ExportAllEnabled { get { return (mAppModel.SuccessfulList.Count > 0 || mAppModel.FailedList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
 
         //Progress bar stuff
         public int ProgressBarPercentage 
@@ -95,12 +101,13 @@ namespace PDL4.ViewModels
             mAppModel = new PDLAppModel();
 
             //Set AppModel callback
-            mAppModel.StateChangedCallback = () =>
+            mAppModel.DownloadProgressCallback = () =>
             {
                 OnPropertyChanged(nameof(SuccessfulDownloads));
                 OnPropertyChanged(nameof(FailedDownloads));
                 OnPropertyChanged(nameof(ProgressBarPercentage));
             };
+            mAppModel.StateChangedCallback = NotifyAll;
 
             //Create commands
             LoadFileCommand = new RelayCommand(() => LoadFile_Click());
@@ -155,10 +162,15 @@ namespace PDL4.ViewModels
             //Lists
             OnPropertyChanged(nameof(SuccessfulDownloads));
             OnPropertyChanged(nameof(FailedDownloads));
-            //Buttons
+            //List Buttons
             OnPropertyChanged(nameof(SuccessfulExportEnabled));
             OnPropertyChanged(nameof(FailedExportEnabled));
             OnPropertyChanged(nameof(ExportAllEnabled));
+            //Control Buttons
+            OnPropertyChanged(nameof(LoadEnabled));
+            OnPropertyChanged(nameof(StartEnabled));
+            OnPropertyChanged(nameof(ResetEnabled));
+            OnPropertyChanged(nameof(StopEnabled));
             //Progress bar
             OnPropertyChanged(nameof(ProgressBarPercentage));
         }
