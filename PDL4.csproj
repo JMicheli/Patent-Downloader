@@ -65,6 +65,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DataModels\PatentStatus.cs" />
+    <Compile Include="Models\PDLDownloader.cs" />
     <Compile Include="TODO.cs" />
     <Compile Include="DataModels\PatentData.cs" />
     <Compile Include="Models\PDLAppModel.cs" />

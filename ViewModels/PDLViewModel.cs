@@ -81,6 +81,13 @@ namespace PDL4.ViewModels
             mWindow = window;
             mAppModel = new PDLAppModel();
 
+            //Set AppModel callback
+            mAppModel.StateChangedCallback = () =>
+            {
+                OnPropertyChanged(nameof(SuccessfulDownloads));
+                OnPropertyChanged(nameof(FailedDownloads));
+            };
+
             //Create commands
             LoadFileCommand = new RelayCommand(() => LoadFile_Click());
 
@@ -112,7 +119,7 @@ namespace PDL4.ViewModels
         private void Start_Click()
         {
             PatentData patent = mAppModel.PatentList[0];
-            mAppModel.DownloadSingle(patent);
+            mAppModel.Download();
         }
 
         private void Reset_Click()
