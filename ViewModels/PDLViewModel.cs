@@ -1,35 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.Win32;
+using System.Collections.Generic;
+
 using PDL4.DataModels;
 using PDL4.Models;
 
 namespace PDL4.ViewModels
 {
+    /// <summary>
+    /// A ViewModel linking the WPF UI to the PDL App classes
+    /// </summary>
     class PDLViewModel : BaseViewModel
     {
         #region Private Members
 
-        // A reference to the window
+        /// <summary>
+        /// A reference to the parent window
+        /// </summary>
         private Window mWindow;
 
-        //A reference to the PDL App Model
+        /// <summary>
+        /// A reference to the internal app model
+        /// </summary>
         private PDLAppModel mAppModel;
 
         #endregion
 
         #region Public Properties
 
+        /// <summary>
+        /// UI setting for phrase preceding number of patents
+        /// </summary>
         public string DistinctPatentsPrefix { get; set; } = "Number of distinct patents: ";
+        /// <summary>
+        /// UI setting for phrase preceding currently open filename
+        /// </summary>
         public string SelectedFilePrefix { get; set; } = "Currently open: ";
+        /// <summary>
+        /// UI setting for filename to display when none is selected
+        /// </summary>
         public string SelectedFileNullSuffix { get; set; } = "Once a file is selected it will appear here";
 
+        /// <summary>
+        /// Binding string for the selected file text
+        /// </summary>
         public string SelectedFile
         {
             get
@@ -41,6 +57,9 @@ namespace PDL4.ViewModels
             }
         }
 
+        /// <summary>
+        /// Binding string for the distinct patents text
+        /// </summary>
         public string DistinctPatentsString
         {
             get
@@ -53,16 +72,37 @@ namespace PDL4.ViewModels
             }
         }
 
+        /// <summary>
+        /// ListView datasource for successful downloads list
+        /// </summary>
         public List<PatentData> SuccessfulDownloads { get { return mAppModel.SuccessfulList; } }
-
+        /// <summary>
+        /// ListView datasource for failed downloads list
+        /// </summary>
         public List<PatentData> FailedDownloads { get { return mAppModel.FailedList; } }
 
         //Download control Button state calculations
+        /// <summary>
+        /// Binding for controling the enabled state of the load button
+        /// </summary>
         public bool LoadEnabled { get { return !(mAppModel.State == PDLAppState.Downloading); } }
+        /// <summary>
+        /// Binding for controling the enabled state of the start button
+        /// </summary>
         public bool StartEnabled { get { return ((mAppModel.State == PDLAppState.Loaded) || (mAppModel.State == PDLAppState.Stopped)); } }
+        /// <summary>
+        /// Binding for controling the enabled state of the reset button
+        /// </summary>
         public bool ResetEnabled { get { return !((mAppModel.State == PDLAppState.Initial) || (mAppModel.State == PDLAppState.Downloading)); } }
+        /// <summary>
+        /// Binding for controling the enabled state of the stop button
+        /// </summary>
         public bool StopEnabled { get { return mAppModel.State == PDLAppState.Downloading; } }
+
         //And the text for the start button
+        /// <summary>
+        /// Binding for what text is displayed in the sart button
+        /// </summary>
         public string StartButtonText
         {
             get
@@ -75,11 +115,23 @@ namespace PDL4.ViewModels
         }
 
         //List Button state calculations (check for both length of list and that it exists)
+        /// <summary>
+        /// Binding for controling the enabled state of the Export Successful button
+        /// </summary>
         public bool SuccessfulExportEnabled { get { return (mAppModel.SuccessfulList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
+        /// <summary>
+        /// Binding for controling the enabled state of the Export Failed button
+        /// </summary>
         public bool FailedExportEnabled { get { return (mAppModel.FailedList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
+        /// <summary>
+        /// Binding for controling the enabled state of the Export All button
+        /// </summary>
         public bool ExportAllEnabled { get { return (mAppModel.SuccessfulList.Count > 0 || mAppModel.FailedList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
 
         //Progress bar stuff
+        /// <summary>
+        /// Binding for the percentage download progress
+        /// </summary>
         public int ProgressBarPercentage 
         {
             get
@@ -110,6 +162,10 @@ namespace PDL4.ViewModels
 
         #region Constructor
 
+        /// <summary>
+        /// Initialize a viewmodel for an input window
+        /// </summary>
+        /// <param name="window">Reference to the parent window</param>
         public PDLViewModel(Window window)
         {
             //Initialize private members
@@ -141,6 +197,9 @@ namespace PDL4.ViewModels
 
         #region Private Fns
 
+        /// <summary>
+        /// Relay point for a LoadFile command
+        /// </summary>
         private void LoadFile_Click()
         {
             //Create dialog and set variables
@@ -158,6 +217,9 @@ namespace PDL4.ViewModels
             }
         }
 
+        /// <summary>
+        /// Relay point for a start command
+        /// </summary>
         private void Start_Click()
         {
             if (mAppModel.State == PDLAppState.Stopped)
@@ -166,18 +228,28 @@ namespace PDL4.ViewModels
                 mAppModel.Download();
         }
 
-        //Reset button to App Model reset
+        /// <summary>
+        /// Relay point for a reset command
+        /// </summary>
         private void Reset_Click() { mAppModel.Reset(); }
 
-        //Stop button to App Model stop
+        /// <summary>
+        /// Relay point for a stop command
+        /// </summary>
         private void Stop_Click() { mAppModel.Stop(); }
 
+        /// <summary>
+        /// Relay point for an arbitrary list export
+        /// </summary>
+        /// <param name="patents">List of patents to be exported</param>
+        /// <param name="default_fname">The default filename for the export</param>
         private void Export_Click(List<PatentData> patents, string default_fname)
         {
             SaveFileDialog save_dialog = new SaveFileDialog();
             save_dialog.DefaultExt = ".txt";
             save_dialog.Title = "Save a list of results";
             save_dialog.FileName = default_fname;
+            save_dialog.Filter = "Text documents (.txt)|*.txt";
             save_dialog.OverwritePrompt = true;
             save_dialog.ValidateNames = true;
 
@@ -207,6 +279,9 @@ namespace PDL4.ViewModels
             File.WriteAllLines(save_dialog.FileName, lines);
         }
 
+        /// <summary>
+        /// Send notification of changes to every binding property
+        /// </summary>
         private void NotifyAll()
         {
             //Labels

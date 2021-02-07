@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
+using System.Linq;
+using System.ComponentModel;
+using System.Collections.Generic;
 
 using HtmlAgilityPack;
 
@@ -12,15 +10,27 @@ using PDL4.DataModels;
 
 namespace PDL4.Models
 {
+    /// <summary>
+    /// A class which handles the download operations for the App,
+    /// should be a private member of the AppModel.
+    /// </summary>
     class PDLDownloader
     {
         #region Private Classes
-
+        
+        /// <summary>
+        /// Private class encompassing a download request's data
+        /// </summary>
         private class DownloadRequest
         {
             public readonly List<PatentData> Patents;
             public readonly string Directory;
 
+            /// <summary>
+            /// Default constructor
+            /// </summary>
+            /// <param name="patents">List of patents to be downloaded</param>
+            /// <param name="directory">Directory to which they will be downloaded</param>
             public DownloadRequest(List<PatentData> patents, string directory)
             {
                 Patents = patents;
@@ -32,26 +42,55 @@ namespace PDL4.Models
 
         #region Delegates
 
+        /// <summary>
+        /// A delegate for reporting a finished download
+        /// </summary>
+        /// <param name="patent">The patent processed</param>
+        /// <param name="time">The timeline state it is placed into</param>
         public delegate void PatentDownloadFinished(PatentData patent, PatentTimeline time);
+        /// <summary>
+        /// A callback with no return or parameters
+        /// </summary>
         public delegate void BasicCallback();
 
         #endregion
 
         #region Private Members
 
+        /// <summary>
+        /// The background worker which will handle downloading
+        /// </summary>
         private BackgroundWorker mBackgroundWorker;
 
+        /// <summary>
+        /// A patent list stored to resume a stopped download
+        /// </summary>
         private List<PatentData> mResumeList;
+        /// <summary>
+        /// A directory stored to resume a stopped download
+        /// </summary>
         private string mResumeDirectory;
 
         #endregion
 
         #region Public Properties
 
+        /// <summary>
+        /// A public handle for the BackgroundWorker's download percentage
+        /// </summary>
         public int DownloadProgressPercentage { get; private set; } = 0;
 
+        /// <summary>
+        /// A callback issued when a patent finishes being processed
+        /// </summary>
         public PatentDownloadFinished DownloadProgressedCallback { get; set; }
+        /// <summary>
+        /// A callback issued when the download process is stopped
+        /// </summary>
         public BasicCallback DownloadHaltedCallback { get; set; }
+        /// <summary>
+        /// A callback issued when the download process reaches its end
+        /// </summary>
         public BasicCallback DownloadFinishedCallback { get; set; }
 
 
@@ -59,6 +98,11 @@ namespace PDL4.Models
 
         #region Public Functions
 
+        /// <summary>
+        /// Begin downloading a list of patents to a directory
+        /// </summary>
+        /// <param name="patents">The list of patents to be downloaded</param>
+        /// <param name="directory">The directory to download them to</param>
         public void Download(List<PatentData> patents, string directory)
         {
             //Encapsulate BackgroundWorker's data
@@ -68,6 +112,11 @@ namespace PDL4.Models
             mBackgroundWorker.RunWorkerAsync(args);
         }
 
+        /// <summary>
+        /// Download a single patent to a directroy
+        /// </summary>
+        /// <param name="patent">The patent to be downloaded</param>
+        /// <param name="directory">The directory to download it to</param>
         public void Download(PatentData patent, string directory)
         {
             var patents = new List<PatentData>();
@@ -75,14 +124,21 @@ namespace PDL4.Models
             Download(patents, directory);
         }
 
+        /// <summary>
+        /// Tell the BackgroundWorker to stop as soon as possible
+        /// </summary>
         public void Halt()
         {
             if (mBackgroundWorker.IsBusy)
                 mBackgroundWorker.CancelAsync();
         }
 
+        /// <summary>
+        /// Restart a stopped download where it left off
+        /// </summary>
         public void Resume()
         {
+            //Resuming is just starting a new download with the resume variables
             Download(mResumeList, mResumeDirectory);
         }
 
@@ -90,6 +146,9 @@ namespace PDL4.Models
 
         #region Constructor
 
+        /// <summary>
+        /// Standard construtor
+        /// </summary>
         public PDLDownloader()
         {
             //Set up background worker
@@ -140,6 +199,11 @@ namespace PDL4.Models
 
         #region Background Worker
 
+        /// <summary>
+        /// The work performed by the BackgroundWorker
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void worker_DownloadWork(object sender, DoWorkEventArgs e)
         {
             //Catch defunct start requests
@@ -198,6 +262,11 @@ namespace PDL4.Models
             }
         }
 
+        /// <summary>
+        /// A callback issued by the worker when progress is changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             DownloadProgressPercentage = e.ProgressPercentage;
