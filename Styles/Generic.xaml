@@ -56,6 +56,13 @@
         <Setter Property="Background" Value="{StaticResource UIDarkBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource UIDarkBrush}" />
         <Setter Property="Foreground" Value="{StaticResource ForegroundMainBrush}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource UIVeryLightBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource UIVeryLightBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     
     <!-- ProgressBar -->
@@ -75,7 +82,11 @@
 
     <!-- ListView Item -->
     <Style TargetType="{x:Type ListViewItem}" x:Key="PDLListViewItem">
-        
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource UIVeryLightBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
 </ResourceDictionary>

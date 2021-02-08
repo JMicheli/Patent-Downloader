@@ -292,11 +292,13 @@
                 <!-- Successful ListView -->
                 <ListView Grid.Column="0" Grid.Row="1" Margin="30 0"
                           Style="{StaticResource PDLListView}"
+                          ItemContainerStyle="{StaticResource PDLListViewItem}"
                           ItemsSource="{Binding SuccessfulDownloads}" />
 
                 <!-- Failed ListView -->
                 <ListView Grid.Column="1" Grid.Row="1" Margin="30 0"
                           Style="{StaticResource PDLListView}"
+                          ItemContainerStyle="{StaticResource PDLListViewItem}"
                           ItemsSource="{Binding FailedDownloads}" />
 
             </Grid>

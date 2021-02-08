@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 using PDL4.DataModels;
 using PDL4.Models;
-using System.Windows.Controls;
 
 namespace PDL4.ViewModels
 {
