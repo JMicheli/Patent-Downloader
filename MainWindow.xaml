@@ -7,9 +7,10 @@
         mc:Ignorable="d"
         Icon="Images/Favicon/favicon.png"
         ResizeMode="NoResize"
+        Drop="MainWindow_Drop" AllowDrop="True"
         Title="Patent Downloader 4.0" Height="600" Width="600">
     
-    <Grid >
+    <Grid>
         <Grid.RowDefinitions>
             <!-- Border -->
             <RowDefinition Height="10"/>
@@ -18,7 +19,7 @@
             <!-- Download output and controls -->
             <RowDefinition Height="*"/>
             <!-- Border -->
-            <RowDefinition Height="10"/>
+            <RowDefinition Height="10"/> 
         </Grid.RowDefinitions>
         
         <Grid.ColumnDefinitions>
@@ -229,15 +230,15 @@
                 <!-- Status text -->
                 <TextBlock Text="{Binding StatusText, FallbackValue='Select File'}" VerticalAlignment="Center" 
                            HorizontalAlignment="Center"/>
-                
+
                 <!-- The progress bar control -->
                 <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" 
                              Value="{Binding ProgressBarPercentage}"/>
 
             </Grid>
-            
-        </Grid>
 
+        </Grid>
+        
     </Grid>
     
 </Window>

@@ -144,6 +144,9 @@ namespace PDL4.ViewModels
             set { }
         }
 
+        /// <summary>
+        /// Binding for the text in the lower left corner
+        /// </summary>
         public string StatusText
         {
             get
@@ -161,6 +164,25 @@ namespace PDL4.ViewModels
 
                     return numer.ToString() + "/" + denom.ToString();
                 }
+            }
+        }
+
+        #endregion
+
+        #region Public Functions
+
+        /// <summary>
+        /// External function for the codebehind to use when a file is dropped
+        /// onto the window.
+        /// </summary>
+        /// <param name="file">Path to the file dropped</param>
+        public void DragAndDrop(string file)
+        {
+            //Currently only allowing .txt files
+            if (Path.GetExtension(file) == ".txt")
+            {
+                mAppModel.LoadFile(file); //Pass path into App Model
+                NotifyAll(); //Notify of changed properties
             }
         }
 
