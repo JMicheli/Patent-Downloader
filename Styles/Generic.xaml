@@ -36,6 +36,22 @@
         </Style.Triggers>
 
     </Style>
-    
-    
+
+    <Style TargetType="{x:Type ProgressBar}" x:Key="PDLProgressbar">
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="100"/>
+        <Setter Property="Foreground"  Value="{StaticResource SC_BlueBrush}"/>
+        <Setter Property="Background"  Value="{StaticResource UIButtonBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource UIButtonBrush}"/>
+    </Style>
+
+    <Style TargetType="{x:Type ListView}" x:Key="PDLListView">
+        <Setter Property="Background"  Value="{StaticResource UIButtonBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource UIButtonBrush}" />
+    </Style>
+
+    <Style TargetType="{x:Type ListViewItem}" x:Key="PDLListViewItem">
+
+    </Style>
+
 </ResourceDictionary>

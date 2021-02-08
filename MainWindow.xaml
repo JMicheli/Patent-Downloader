@@ -189,11 +189,16 @@
                     <RowDefinition Height="20" />
                 </Grid.RowDefinitions>
 
+                <!-- Background block -->
+                <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="3"
+                        CornerRadius="3"
+                        Background="{StaticResource UIButtonDisabledBrush}"  />
+
                 <!-- Info text output -->
                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedFile, FallbackValue='Once a file is selected it will appear here'}" 
-                           VerticalAlignment="Center"/>
+                           Padding="5 0" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DistinctPatentsString, FallbackValue='Currently open: None loaded'}" 
-                           VerticalAlignment="Center"/>
+                           Padding="5 0" VerticalAlignment="Center"/>
             </Grid>
 
             <!-- Start/Reset/Stop buttons -->
@@ -275,8 +280,10 @@
 
                 <TextBlock Grid.Row="0" Text="Successful downloads" />
 
-                <ListView Grid.Row="1" Margin="5"
-                          ItemsSource="{Binding SuccessfulDownloads}"></ListView>
+                <ListView Grid.Row="1" Margin="5" Style="{StaticResource PDLListView}"
+                          ItemContainerStyle="{StaticResource PDLListViewItem}"
+                          ItemsSource="{Binding SuccessfulDownloads}">
+                </ListView>
             </Grid>
 
             <!-- Successful downloads controls -->
@@ -294,7 +301,7 @@
                 <Button Grid.Row="1" Content="Export" Margin="5 3"
                         Style="{StaticResource PDLButton}"
                         Command="{Binding ExportSuccessfulCommand}"
-                        IsEnabled="{Binding SuccessfulExportEnabled}"/>
+                        IsEnabled="{Binding SuccessfulExportEnabled, FallbackValue=false}"/>
             </Grid>
 
             <!-- Failed downloads region -->
@@ -308,7 +315,8 @@
 
                 <TextBlock Grid.Row="0" Text="Failed downloads" />
 
-                <ListView Grid.Row="1" Margin="5"
+                <ListView Grid.Row="1" Margin="5" Style="{StaticResource PDLListView}"
+                          ItemContainerStyle="{StaticResource PDLListViewItem}"
                           ItemsSource="{Binding FailedDownloads}"></ListView>
             </Grid>
 
@@ -331,13 +339,13 @@
                 <Button Grid.Row="1" Content="Export" Margin="5 3"
                         Style="{StaticResource PDLButton}"
                         Command="{Binding ExportFailedCommand}"
-                        IsEnabled="{Binding FailedExportEnabled}" />
+                        IsEnabled="{Binding FailedExportEnabled, FallbackValue=false}" />
 
                 <!-- Export All button -->
                 <Button Grid.Row="3" Content="Export All" Margin="5 3"
                         Style="{StaticResource PDLButton}"
                         Command="{Binding ExportAllCommand}"
-                        IsEnabled="{Binding ExportAllEnabled}" />
+                        IsEnabled="{Binding ExportAllEnabled, FallbackValue=false}" />
 
             </Grid>
 
@@ -355,8 +363,8 @@
                            HorizontalAlignment="Center"/>
 
                 <!-- The progress bar control -->
-                <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" 
-                             Value="{Binding ProgressBarPercentage}"/>
+                <ProgressBar Grid.Column="1" Style="{StaticResource PDLProgressbar}"
+                             Value="{Binding ProgressBarPercentage, FallbackValue=25}" />
 
             </Grid>
 
