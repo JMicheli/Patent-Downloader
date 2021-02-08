@@ -15,6 +15,14 @@ namespace PDL4.DataModels
         Failed
     }
 
+    public enum PatentError
+    {
+        None,
+        InvalidLine,
+        NoUrlFound,
+        DownloadFailed
+    }
+
     #endregion
 
     class PatentStatus
@@ -22,6 +30,7 @@ namespace PDL4.DataModels
         #region Public Properties
 
         public PatentTimeline Timeline { get; set; }
+        public PatentError Error { get; set; }
 
         public string TimelineString
         {
@@ -48,6 +57,7 @@ namespace PDL4.DataModels
         public PatentStatus()
         {
             Timeline = PatentTimeline.None;
+            Error = PatentError.None;
         }
 
         #endregion
