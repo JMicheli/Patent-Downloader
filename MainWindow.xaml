@@ -11,7 +11,7 @@
         Icon="Images/Favicon/favicon.png"
         ResizeMode="NoResize"
         Drop="MainWindow_Drop" AllowDrop="True"
-        Title="Patent Downloader 4.0" Height="650" Width="650">
+        Title="Patent Downloader 4.0" Height="700" Width="650">
 
     <Window.Resources>
         <Style TargetType="{x:Type local:MainWindow}">
@@ -182,7 +182,7 @@
                     <!-- File Info -->
                     <RowDefinition Height="*" />
                     <!-- Middle Border -->
-                    <RowDefinition Height="10" />
+                    <RowDefinition Height="5" />
                     <!-- Patent number -->
                     <RowDefinition Height="*" />
                     <!-- Border -->
@@ -192,13 +192,15 @@
                 <!-- Background block -->
                 <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="3"
                         CornerRadius="3"
-                        Background="{StaticResource UIButtonDisabledBrush}"  />
+                        Background="{StaticResource UILightBrush}" />
 
                 <!-- Info text output -->
                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedFile, FallbackValue='Once a file is selected it will appear here'}" 
-                           Padding="5 0" VerticalAlignment="Center"/>
+                           Padding="5 0" VerticalAlignment="Center"
+                           Style="{StaticResource UIText}" />
                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DistinctPatentsString, FallbackValue='Currently open: None loaded'}" 
-                           Padding="5 0" VerticalAlignment="Center"/>
+                           Padding="5 0" VerticalAlignment="Center"
+                           Style="{StaticResource UIText}" />
             </Grid>
 
             <!-- Start/Reset/Stop buttons -->
@@ -254,103 +256,160 @@
             <Grid.RowDefinitions>
                 <!-- Lists and controls -->
                 <RowDefinition Height="*" />
+                <!-- Export options -->
+                <RowDefinition Height="100" />
                 <!-- Progress bar -->
                 <RowDefinition Height="25" />
             </Grid.RowDefinitions>
+            
+            <!-- Outcome ListViews -->
+            <Grid Margin="5">
 
-            <Grid.ColumnDefinitions>
-                <!-- Successful downloads list-->
-                <ColumnDefinition Width="*" />
-                <!-- Successful controls -->
-                <ColumnDefinition Width="80" />
-                <!-- Failed downloads list -->
-                <ColumnDefinition Width="*" />
-                <!-- Failed controls -->
-                <ColumnDefinition Width="80" />
-            </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <!-- Successful Region -->
+                    <ColumnDefinition Width="*" />
+                    <!-- Failed Region -->
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <!-- Successful downloads region -->
-            <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <!-- Header -->
-                    <RowDefinition Height="15" />
-                    <!-- Listview -->
+                    <!-- View titles -->
+                    <RowDefinition Height="25" />
+                    <!-- Views -->
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
+                
+                <!-- Successful title -->
+                <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontSize="20" Style="{StaticResource HeaderText}"
+                           Text="Successful Downloads" />
 
-                <TextBlock Grid.Row="0" Text="Successful downloads" />
+                <!-- Failed title -->
+                <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontSize="20" Style="{StaticResource HeaderText}"
+                           Text="Failed Downloads" />
+                
+                <!-- Successful ListView -->
+                <ListView Grid.Column="0" Grid.Row="1" Margin="30 0"
+                          Style="{StaticResource PDLListView}"
+                          ItemsSource="{Binding SuccessfulDownloads}" />
 
-                <ListView Grid.Row="1" Margin="5" Style="{StaticResource PDLListView}"
-                          ItemContainerStyle="{StaticResource PDLListViewItem}"
-                          ItemsSource="{Binding SuccessfulDownloads}">
-                </ListView>
-            </Grid>
-
-            <!-- Successful downloads controls -->
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <!-- Top border -->
-                    <RowDefinition Height="25" />
-                    <!-- Export button -->
-                    <RowDefinition Height="25" />
-                    <!-- Bottom fill -->
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!-- Export button -->
-                <Button Grid.Row="1" Content="Export" Margin="5 3"
-                        Style="{StaticResource PDLButton}"
-                        Command="{Binding ExportSuccessfulCommand}"
-                        IsEnabled="{Binding SuccessfulExportEnabled, FallbackValue=false}"/>
-            </Grid>
-
-            <!-- Failed downloads region -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <!-- Header -->
-                    <RowDefinition Height="15" />
-                    <!-- Listview -->
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0" Text="Failed downloads" />
-
-                <ListView Grid.Row="1" Margin="5" Style="{StaticResource PDLListView}"
-                          ItemContainerStyle="{StaticResource PDLListViewItem}"
-                          ItemsSource="{Binding FailedDownloads}"></ListView>
-            </Grid>
-
-            <!-- Failed downloads controls -->
-            <Grid Grid.Column="3">
-                <Grid.RowDefinitions>
-                    <!-- Top border -->
-                    <RowDefinition Height="25" />
-                    <!-- Export button -->
-                    <RowDefinition Height="25" />
-                    <!-- Bottom fill -->
-                    <RowDefinition Height="*" />
-                    <!-- Export All button -->
-                    <RowDefinition Height="25" />
-                    <!-- Bottom border -->
-                    <RowDefinition Height="10" />
-                </Grid.RowDefinitions>
-
-                <!-- Export button -->
-                <Button Grid.Row="1" Content="Export" Margin="5 3"
-                        Style="{StaticResource PDLButton}"
-                        Command="{Binding ExportFailedCommand}"
-                        IsEnabled="{Binding FailedExportEnabled, FallbackValue=false}" />
-
-                <!-- Export All button -->
-                <Button Grid.Row="3" Content="Export All" Margin="5 3"
-                        Style="{StaticResource PDLButton}"
-                        Command="{Binding ExportAllCommand}"
-                        IsEnabled="{Binding ExportAllEnabled, FallbackValue=false}" />
+                <!-- Failed ListView -->
+                <ListView Grid.Column="1" Grid.Row="1" Margin="30 0"
+                          Style="{StaticResource PDLListView}"
+                          ItemsSource="{Binding FailedDownloads}" />
 
             </Grid>
 
-            <!-- Progress bar region -->
+            <!-- Export options -->
             <Grid Grid.Row="1" Grid.ColumnSpan="4">
+
+                <Grid.RowDefinitions>
+                    <!-- Border -->
+                    <RowDefinition Height="5" />
+                    <!-- Section title -->
+                    <RowDefinition Height="20" />
+                    <!-- Section content -->
+                    <RowDefinition Height="*" />
+                    <!-- Border -->
+                    <RowDefinition Height="5" />
+                </Grid.RowDefinitions>
+                
+                <Grid.ColumnDefinitions>
+                    <!-- Border -->
+                    <ColumnDefinition Width="5" />
+                    <!-- Content -->
+                    <ColumnDefinition Width="*" />
+                    <!-- Border -->
+                    <ColumnDefinition Width="5" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Background -->
+                <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2"
+                CornerRadius="3" Background="{StaticResource UILightBrush}" />
+
+                <!-- Section Title -->
+                <TextBlock Grid.Column="1" Grid.Row="1"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Style="{StaticResource UIText}" Text="Export Options" />
+
+                <!-- Options -->
+                <Grid Grid.Column="1" Grid.Row="2" Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <!-- Success/Failed Checkboxes -->
+                        <ColumnDefinition Width="auto" />
+                        <!-- Country Code/Suffix Checkboxes -->
+                        <ColumnDefinition Width="auto" />
+                        <!-- Filler -->
+                        <ColumnDefinition Width="*" />
+                        <!-- Verbose/Export controls -->
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Success/Failed Checkboxes -->
+                    <StackPanel Grid.Column="0">
+                        <CheckBox IsChecked="{Binding ExportSuccessfulBool}" Margin="0 5"
+                                  Content="Export Successful"
+                                  Style="{StaticResource PDLCheckBox}" />
+                        <CheckBox IsChecked="{Binding IncludeCCBool}" Margin="0 5"
+                                  Content="Include country code"
+                                  Style="{StaticResource PDLCheckBox}" />
+                    </StackPanel>
+
+                    <!-- Country Code/Suffix Checkboxes -->
+                    <StackPanel Grid.Column="1" Margin="15 0">
+                        <CheckBox IsChecked="{Binding ExportFailedBool}" Margin="0 5"
+                                  Content="Export Failed"
+                                  Style="{StaticResource PDLCheckBox}" />
+                        <CheckBox IsChecked="{Binding IncludeSSBool}" Margin="0 5"
+                                  Content="Include status suffix"
+                                  Style="{StaticResource PDLCheckBox}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <CheckBox IsChecked="{Binding ExporUnprocessedBool}" Margin="0 5"
+                                  Content="Export Unprocessed"
+                                  Style="{StaticResource PDLCheckBox}" />
+                    </StackPanel>
+                    
+                    <!-- Verbose/Export controls -->
+                    <Grid Grid.Column="3">
+
+                        <Grid.ColumnDefinitions>
+                            <!-- Button pad -->
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="*" />
+                            <!-- Export Button -->
+                        </Grid.ColumnDefinitions>
+                        
+                        <Grid.RowDefinitions>
+                            <!-- Checkbox(es) -->
+                            <RowDefinition Height="*" />
+                            <!-- Export button -->
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Verbose (and future) Checkboxes -->
+                        <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+                            <CheckBox IsChecked="{Binding VerboseBool}" Margin="0 5"
+                                      Content="Verbose logging"
+                                      Style="{StaticResource PDLCheckBox}" />
+                        </StackPanel>
+
+                        <!-- Export Button -->
+                        <Button Grid.Column="1" Grid.Row="1" Content="Export" 
+                                Style="{StaticResource PDLButton}"
+                                Command="{Binding ExportCommand}" 
+                                IsEnabled="{Binding ExportEnabled, FallbackValue=false}" />
+
+                    </Grid>
+
+                </Grid>
+                
+            </Grid>
+            
+            <!-- Progress bar region -->
+            <Grid Grid.Row="2" Grid.ColumnSpan="4">
                 <Grid.ColumnDefinitions>
                     <!-- Status output -->
                     <ColumnDefinition Width="80" />
@@ -360,7 +419,8 @@
 
                 <!-- Status text -->
                 <TextBlock Text="{Binding StatusText, FallbackValue='Select File'}" VerticalAlignment="Center" 
-                           HorizontalAlignment="Center"/>
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource UIText}" />
 
                 <!-- The progress bar control -->
                 <ProgressBar Grid.Column="1" Style="{StaticResource PDLProgressbar}"

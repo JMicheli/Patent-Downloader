@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 using PDL4.DataModels;
 using PDL4.Models;
+using System.Windows.Controls;
 
 namespace PDL4.ViewModels
 {
@@ -14,6 +15,46 @@ namespace PDL4.ViewModels
     /// </summary>
     class PDLViewModel : BaseViewModel
     {
+        #region Private Classes
+
+        /// <summary>
+        /// A container class for parameters impacting export
+        /// </summary>
+        private class ExportParameters
+        {
+            /// <summary>
+            /// Should the successful list be exported?
+            /// </summary>
+            public bool ExportSuccessful;
+            /// <summary>
+            /// Should the failed list be exported?
+            /// </summary>
+            public bool ExportFailed;
+            /// <summary>
+            /// Should the unprocessed list be exported?
+            /// </summary>
+            public bool ExportUnprocessed;
+            /// <summary>
+            /// Should the patent name include the country code?
+            /// </summary>
+            public bool IncludeCountryCode;
+            /// <summary>
+            /// Should the patent line include "was successfully downloaded" etc?
+            /// </summary>
+            public bool IncludeStatusSuffix;
+            /// <summary>
+            /// Should logging include debugging info?
+            /// </summary>
+            public bool VerboseLogging;
+
+            /// <summary>
+            /// The filename selected by the user
+            /// </summary>
+            public string FileName;
+        }
+
+        #endregion
+
         #region Private Members
 
         /// <summary>
@@ -83,25 +124,25 @@ namespace PDL4.ViewModels
 
         //Download control Button state calculations
         /// <summary>
-        /// Binding for controling the enabled state of the load button
+        /// Binding for controling the enabled state of the Load Button
         /// </summary>
         public bool LoadEnabled { get { return !(mAppModel.State == PDLAppState.Downloading); } }
         /// <summary>
-        /// Binding for controling the enabled state of the start button
+        /// Binding for controling the enabled state of the Start Button
         /// </summary>
         public bool StartEnabled { get { return ((mAppModel.State == PDLAppState.Loaded) || (mAppModel.State == PDLAppState.Stopped)); } }
         /// <summary>
-        /// Binding for controling the enabled state of the reset button
+        /// Binding for controling the enabled state of the Reset Button
         /// </summary>
         public bool ResetEnabled { get { return !((mAppModel.State == PDLAppState.Initial) || (mAppModel.State == PDLAppState.Downloading)); } }
         /// <summary>
-        /// Binding for controling the enabled state of the stop button
+        /// Binding for controling the enabled state of the Stop Button
         /// </summary>
         public bool StopEnabled { get { return mAppModel.State == PDLAppState.Downloading; } }
 
         //And the text for the start button
         /// <summary>
-        /// Binding for what text is displayed in the sart button
+        /// Binding for what text is displayed in the Start Button
         /// </summary>
         public string StartButtonText
         {
@@ -114,19 +155,26 @@ namespace PDL4.ViewModels
             }
         }
 
-        //List Button state calculations (check for both length of list and that it exists)
         /// <summary>
-        /// Binding for controling the enabled state of the Export Successful button
+        /// Binding for controlling the enabled state of the Export Button
         /// </summary>
-        public bool SuccessfulExportEnabled { get { return (mAppModel.SuccessfulList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
-        /// <summary>
-        /// Binding for controling the enabled state of the Export Failed button
-        /// </summary>
-        public bool FailedExportEnabled { get { return (mAppModel.FailedList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
-        /// <summary>
-        /// Binding for controling the enabled state of the Export All button
-        /// </summary>
-        public bool ExportAllEnabled { get { return (mAppModel.SuccessfulList.Count > 0 || mAppModel.FailedList.Count > 0) && (mAppModel.State != PDLAppState.Downloading); } }
+        public bool ExportEnabled 
+        {
+            get
+            {
+                if(mAppModel.State > PDLAppState.Downloading)
+                {
+                    if (ExportUnprocessedBool && (0 < mAppModel.PatentList.Count - (mAppModel.SuccessfulList.Count + mAppModel.FailedList.Count)))
+                        return true;
+                    if (ExportSuccessfulBool && (0 < mAppModel.SuccessfulList.Count))
+                        return true;
+                    if (ExportFailedBool && (0 < mAppModel.FailedList.Count))
+                        return true;
+                }
+
+                return false;
+            }
+        }
 
         //Progress bar stuff
         /// <summary>
@@ -143,6 +191,32 @@ namespace PDL4.ViewModels
             }
             set { }
         }
+
+        //Bindings for the various CheckBoxes
+        /// <summary>
+        /// Checked state of the Export Successful export option
+        /// </summary>
+        public bool ExportSuccessfulBool { get; set; } = true;
+        /// <summary>
+        /// Checked state of the Export Failed export option
+        /// </summary>
+        public bool ExportFailedBool { get; set; } = true;
+        /// <summary>
+        /// Checked state of the Export Unprocessed export option
+        /// </summary>
+        public bool ExportUnprocessedBool { get; set; } = true;
+        /// <summary>
+        /// Checked state of the Include country code export option
+        /// </summary>
+        public bool IncludeCCBool { get; set; } = true;
+        /// <summary>
+        /// Checked state of the Include state suffix export option
+        /// </summary>
+        public bool IncludeSSBool { get; set; } = true;
+        /// <summary>
+        /// Checked state of the Verbose logging export option
+        /// </summary>
+        public bool VerboseBool { get; set; } = false;
 
         /// <summary>
         /// Binding for the text in the lower left corner
@@ -198,9 +272,7 @@ namespace PDL4.ViewModels
         public ICommand ResetCommand { get; set; }
         public ICommand StopCommand  { get; set; }
 
-        public ICommand ExportSuccessfulCommand { get; set; }
-        public ICommand ExportFailedCommand     { get; set; }
-        public ICommand ExportAllCommand        { get; set; }
+        public ICommand ExportCommand        { get; set; }
 
         #endregion
 
@@ -235,9 +307,7 @@ namespace PDL4.ViewModels
             ResetCommand = new RelayCommand(Reset_Click);
             StopCommand = new RelayCommand(Stop_Click);
 
-            ExportSuccessfulCommand = new RelayCommand(() => { Export_Click(mAppModel.SuccessfulList, "Successful.txt"); });
-            ExportFailedCommand     = new RelayCommand(() => { Export_Click(mAppModel.FailedList, "Failed.txt"); });
-            ExportAllCommand        = new RelayCommand(() => { Export_Click(mAppModel.PatentList, "All.txt"); });
+            ExportCommand = new RelayCommand(() => { Export_Click(); });
         }
 
         #endregion
@@ -254,7 +324,6 @@ namespace PDL4.ViewModels
             load_diag.DefaultExt = ".txt";
             load_diag.Title = "Load a list of patents";
             load_diag.Filter = "Text documents (.txt)|*.txt";
-            //load_diag.Multiselect = true;
 
             //Only continue if a file was selected
             if (load_diag.ShowDialog() == true)
@@ -286,16 +355,20 @@ namespace PDL4.ViewModels
         private void Stop_Click() { mAppModel.Stop(); }
 
         /// <summary>
-        /// Relay point for an arbitrary list export
+        /// Relay point for starting an export operation
         /// </summary>
-        /// <param name="patents">List of patents to be exported</param>
-        /// <param name="default_fname">The default filename for the export</param>
-        private void Export_Click(List<PatentData> patents, string default_fname)
+        private void Export_Click()
         {
+            //Store ExportParameters
+            ExportParameters ep = new ExportParameters();
+            ep.ExportSuccessful = ExportSuccessfulBool; ep.ExportFailed = ExportFailedBool;
+            ep.IncludeCountryCode = IncludeCCBool; ep.IncludeStatusSuffix = IncludeSSBool;
+            ep.ExportUnprocessed = ExportUnprocessedBool; ep.VerboseLogging = VerboseBool;
+
             SaveFileDialog save_dialog = new SaveFileDialog();
             save_dialog.DefaultExt = ".txt";
             save_dialog.Title = "Save a list of results";
-            save_dialog.FileName = default_fname;
+            save_dialog.FileName = "Export.txt";
             save_dialog.Filter = "Text documents (.txt)|*.txt";
             save_dialog.OverwritePrompt = true;
             save_dialog.ValidateNames = true;
@@ -304,26 +377,53 @@ namespace PDL4.ViewModels
             if (save_dialog.ShowDialog() != true)
                 return;
 
-            //Prepare file contents
-            string[] lines = new string[patents.Count];
-            for (int i = 0; i < patents.Count; i++)
-            {
-                PatentData patent = patents[i];
+            ep.FileName = save_dialog.FileName;
 
-                lines[i] = patent.CondensedTitle;
+            Export_Perform(ep);
+        }
+
+        /// <summary>
+        /// Performs an export based on input ExportParameters
+        /// </summary>
+        /// <param name="param">The parameters describing the export</param>
+        private void Export_Perform(ExportParameters param)
+        {
+            List<string> lines = new List<string>();
+            foreach (PatentData patent in mAppModel.PatentList)
+            {
+                //Skip non-applicable patents
                 PatentStatus status = mAppModel.GetPatentStatus(patent);
-                if (status.Timeline == PatentTimeline.None)
-                    lines[i] += " was not processed";
-                else if (status.Timeline == PatentTimeline.Succeeded)
-                    lines[i] += " was successfully downloaded";
-                else if (status.Timeline == PatentTimeline.Failed)
-                    lines[i] += " failed to download";
+                if (!(ExportUnprocessedBool) && (status.Timeline == PatentTimeline.None))
+                    continue;
+                if (!(ExportSuccessfulBool) && (status.Timeline == PatentTimeline.Succeeded))
+                    continue;
+                if (!(ExportFailedBool) && (status.Timeline == PatentTimeline.Failed))
+                    continue;
+
+                string line;
+                //Basic patent number
+                if (param.IncludeCountryCode == true)
+                    line = patent.CondensedTitle;
                 else
-                    lines[i] += " had an unknown error";
+                    line = patent.GrantNumber.ToString();
+
+                if (param.IncludeStatusSuffix)
+                {
+                    if (status.Timeline == PatentTimeline.None)
+                        line += " was not processed";
+                    else if (status.Timeline == PatentTimeline.Succeeded)
+                        line += " was successfully downloaded";
+                    else if (status.Timeline == PatentTimeline.Failed)
+                        line += " failed to download";
+                    else
+                        line += " had an unknown error";
+                }
+
+                lines.Add(line);
             }
 
             //Write contents to file
-            File.WriteAllLines(save_dialog.FileName, lines);
+            File.WriteAllLines(param.FileName, lines);
         }
 
         /// <summary>
@@ -337,10 +437,6 @@ namespace PDL4.ViewModels
             //Lists
             OnPropertyChanged(nameof(SuccessfulDownloads));
             OnPropertyChanged(nameof(FailedDownloads));
-            //List Buttons
-            OnPropertyChanged(nameof(SuccessfulExportEnabled));
-            OnPropertyChanged(nameof(FailedExportEnabled));
-            OnPropertyChanged(nameof(ExportAllEnabled));
             //Control Buttons
             OnPropertyChanged(nameof(LoadEnabled));
             OnPropertyChanged(nameof(StartEnabled));
@@ -350,6 +446,8 @@ namespace PDL4.ViewModels
             //Progress bar
             OnPropertyChanged(nameof(ProgressBarPercentage));
             OnPropertyChanged(nameof(StatusText));
+            //Export Button
+            OnPropertyChanged(nameof(ExportEnabled));
         }
 
         #endregion

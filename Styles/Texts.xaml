@@ -9,4 +9,8 @@
         <Setter Property="Margin" Value="0 4" />
     </Style>
 
+    <Style TargetType="{x:Type TextBlock}" x:Key="UIText" BasedOn="{StaticResource BaseTextBlockStyle}">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundMainBrush}" />
+    </Style>
+
 </ResourceDictionary>

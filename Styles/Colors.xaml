@@ -9,12 +9,15 @@
     <Color x:Key="SC_HighlightBlue">#B9BDDA</Color>
     <SolidColorBrush x:Key="SC_HighlightBlueBrush" Color="{StaticResource SC_HighlightBlue}" />
 
-    <Color x:Key="UIButton">#cfcfcf</Color>
-    <SolidColorBrush x:Key="UIButtonBrush" Color="{StaticResource UIButton}" />
+    <Color x:Key="UIDark">#cfcfcf</Color>
+    <SolidColorBrush x:Key="UIDarkBrush" Color="{StaticResource UIDark}" />
 
-    <Color x:Key="UIButtonDisabled">#efefef</Color>
-    <SolidColorBrush x:Key="UIButtonDisabledBrush" Color="{StaticResource UIButtonDisabled}" />
+    <Color x:Key="UILight">#efefef</Color>
+    <SolidColorBrush x:Key="UILightBrush" Color="{StaticResource UILight}" />
 
+    <Color x:Key="UIVeryLight">#f5f5f5</Color>
+    <SolidColorBrush x:Key="UIVeryLightBrush" Color="{StaticResource UIVeryLight}" />
+    
     <Color x:Key="UIDisabledText">#a0a0a0</Color>
     <SolidColorBrush x:Key="UIDisabledTextBrush" Color="{StaticResource UIDisabledText}" />
 
