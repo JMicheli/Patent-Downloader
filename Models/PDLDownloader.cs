@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using HtmlAgilityPack;
 
 using PDL4.DataModels;
+using System.Threading.Tasks;
 
 namespace PDL4.Models
 {
@@ -212,40 +213,40 @@ namespace PDL4.Models
             {
                 //Set up variables prior to loop
                 BackgroundWorker worker = sender as BackgroundWorker;
-                WebClient client = new WebClient();
+
+                //Progress setup
+                int i = 0; //Counting total patents done
                 int total = download_request.Patents.Count;
 
-                //Process each patent in turn (can we make this have multiple simultaneous downloads
-                int i;
-                for (i = 0; i < total; i++)
+                //Initiate parallel download operations
+                Parallel.ForEach(download_request.Patents,
+                    new ParallelOptions { MaxDegreeOfParallelism = 10 },
+                    (patent, state) =>
                 {
-                    //Check for cancellation
                     if (worker.CancellationPending)
                     {
                         e.Cancel = true;
-                        break;
+                        state.Break();
                     }
                     else
                     {
-                        PatentData patent = download_request.Patents[i];
-
                         string url = GetPatentDownloadURL(patent);
                         string fname = download_request.Directory + patent.CondensedTitle + ".pdf";
-                        int progress = Convert.ToInt32(100 * (float)(i + 1) / (float)total);
 
-                        //Catch url failures
                         if (url == null)
                         {
                             DownloadProgressedCallback(patent, PatentTimeline.Failed);
-                            worker.ReportProgress(progress);
-                            continue;
+                            i++; worker.ReportProgress((i * 100) / total);
                         }
-
-                        client.DownloadFile(url, fname);
-                        DownloadProgressedCallback(patent, PatentTimeline.Succeeded);
-                        worker.ReportProgress(progress);
+                        else
+                        {
+                            WebClient client = new WebClient();
+                            client.DownloadFile(url, fname);
+                            DownloadProgressedCallback(patent, PatentTimeline.Succeeded);
+                            i++; worker.ReportProgress((i * 100) / total);
+                        }
                     }
-                }
+                });
 
                 //Make appropriate callback based on why we're ending
                 if (worker.CancellationPending)
@@ -256,7 +257,7 @@ namespace PDL4.Models
                     mResumeDirectory = download_request.Directory;
 
                     DownloadHaltedCallback();
-                }  
+                }
                 else
                     DownloadFinishedCallback();
             }
