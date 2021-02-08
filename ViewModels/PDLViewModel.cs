@@ -190,6 +190,8 @@ namespace PDL4.ViewModels
 
         #region Commands
 
+        public ICommand CloseCommand { get; set; }
+
         public ICommand LoadFileCommand { get; set; }
 
         public ICommand StartCommand { get; set; }
@@ -225,6 +227,8 @@ namespace PDL4.ViewModels
             mAppModel.StateChangedCallback = NotifyAll;
 
             //Create commands
+            CloseCommand = new RelayCommand(() => mWindow.Close());
+
             LoadFileCommand = new RelayCommand(() => LoadFile_Click());
 
             StartCommand = new RelayCommand(Start_Click);

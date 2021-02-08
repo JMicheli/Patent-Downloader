@@ -2,8 +2,39 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:PDL4">
 
-    <!-- Boilerplate UI Colors -->
+    <!-- Accent colors -->
     <Color x:Key="SC_Blue">#081267</Color>
     <SolidColorBrush x:Key="SC_BlueBrush" Color="{StaticResource SC_Blue}" />
+
+    <Color x:Key="SC_HighlightBlue">#B9BDDA</Color>
+    <SolidColorBrush x:Key="SC_HighlightBlueBrush" Color="{StaticResource SC_HighlightBlue}" />
+
+    <Color x:Key="UIButton">#cfcfcf</Color>
+    <SolidColorBrush x:Key="UIButtonBrush" Color="{StaticResource UIButton}" />
+
+    <Color x:Key="UIButtonDisabled">#efefef</Color>
+    <SolidColorBrush x:Key="UIButtonDisabledBrush" Color="{StaticResource UIButtonDisabled}" />
+
+    <Color x:Key="UIDisabledText">#a0a0a0</Color>
+    <SolidColorBrush x:Key="UIDisabledTextBrush" Color="{StaticResource UIDisabledText}" />
+
+    <Color x:Key="UIButtonHighlight">#efefef</Color>
+    <SolidColorBrush x:Key="UIButtonHighlightBrush" Color="{StaticResource UIButtonHighlight}" />
+
+    <!-- Boilerplate UI Colors -->
+    <Color x:Key="BackgroundLight">#efefef</Color>
+    <SolidColorBrush x:Key="BackgroundLightBrush" Color="{StaticResource BackgroundLight}" />
+
+    <Color x:Key="BackgroundVeryLight">#fafafa</Color>
+    <SolidColorBrush x:Key="BackgroundVeryLightBrush" Color="{StaticResource BackgroundVeryLight}" />
+
+    <Color x:Key="ForegroundMain">#686868</Color>
+    <SolidColorBrush x:Key="ForegroundMainBrush" Color="{StaticResource ForegroundMain}" />
+
+    <Color x:Key="ForegroundVeryDark">#000000</Color>
+    <SolidColorBrush x:Key="ForegroundVeryDarkBrush" Color="{StaticResource ForegroundVeryDark}" />
+
+    <Color x:Key="ForegroundLight">#ffffff</Color>
+    <SolidColorBrush x:Key="ForegroundLightBrush" Color="{StaticResource ForegroundLight}" />
 
 </ResourceDictionary>

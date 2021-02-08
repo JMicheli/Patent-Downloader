@@ -5,11 +5,127 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PDL4"
         mc:Ignorable="d"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        x:Name="AppWindow"
         Icon="Images/Favicon/favicon.png"
         ResizeMode="NoResize"
         Drop="MainWindow_Drop" AllowDrop="True"
-        Title="Patent Downloader 4.0" Height="600" Width="600">
-    
+        Title="Patent Downloader 4.0" Height="650" Width="650">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type local:MainWindow}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <!-- Outer border w/ drop shadow margin-->
+                        <Border Padding="10">
+                            <!-- Main window outline -->
+                            <Grid>
+                                
+                                <!-- Main window with border and drop shadow -->
+                                <Border CornerRadius="6"
+                                        Background="{StaticResource ForegroundLightBrush}">
+                                    <Border.Effect>
+                                        <DropShadowEffect ShadowDepth="0" Opacity="0.2" />
+                                    </Border.Effect>
+                                </Border>
+                                
+                                <!-- Opacity mask for corners -->
+                                <Border x:Name="Container"
+                                        Background="{StaticResource BackgroundVeryLightBrush}"
+                                        CornerRadius="6" />
+                                
+                                <!-- Main window content -->
+                                <Grid>
+                                    
+                                    <!-- Corner clipping -->
+                                    <Grid.OpacityMask>
+                                        <VisualBrush Visual="{Binding ElementName=Container}" />
+                                    </Grid.OpacityMask>
+
+                                    <Grid.RowDefinitions>
+                                        <!-- Title Bar -->
+                                        <RowDefinition Height="35" />
+                                        <!-- Drop shadow -->
+                                        <RowDefinition Height="auto" />
+                                        <!-- Window content -->
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!-- Title Bar -->
+                                    <Grid Grid.Column="0" Panel.ZIndex="1">
+
+                                        <Grid.ColumnDefinitions>
+                                            <!-- Icon -->
+                                            <ColumnDefinition Width="auto" />
+                                            <!-- Title -->
+                                            <ColumnDefinition Width="*" />
+                                            <!-- Window Buttons -->
+                                            <ColumnDefinition Width="auto" />
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- Icon -->
+                                        <Button Style="{StaticResource SystemIconButton}" WindowChrome.IsHitTestVisibleInChrome="True">
+                                            <Image Source="/Images/Favicon/favicon.png" />
+                                        </Button>
+                                        
+                                        <!-- Title -->
+                                        <Viewbox Grid.Column="1" Margin="0" Stretch="Uniform">
+                                            <TextBlock Style="{StaticResource HeaderText}" Text="Patent Downloader" />
+                                        </Viewbox>
+                                        
+                                        <!-- Close button -->
+                                        <Button Grid.Column="2" Command="{Binding CloseCommand}" 
+                                                Style="{StaticResource WindowCloseButton}" Content="X" />
+
+                                    </Grid>
+                                    
+                                    <!-- Drop shadow -->
+                                    <Border Grid.Row="1" Height="6" BorderThickness="0 0.2 0 0">
+                                        <!-- Underline -->
+                                        <Border.BorderBrush>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="{StaticResource BackgroundVeryLight}" Offset="0.0" />
+                                                <GradientStop Color="{StaticResource ForegroundMain}" Offset="0.5" />
+                                                <GradientStop Color="{StaticResource BackgroundVeryLight}" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Border.BorderBrush>
+
+                                        <!-- Drop shadow -->
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="{StaticResource BackgroundLight}" Offset="0.0" />
+                                                <GradientStop Color="{StaticResource BackgroundVeryLight}" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+
+                                    </Border>
+                                    
+                                    <!-- Page content -->
+                                    <Border Grid.Row="2">
+                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                    </Border>
+
+                                </Grid>
+                                
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+            ResizeBorderThickness="16"
+            CaptionHeight="35"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            />
+    </WindowChrome.WindowChrome>
+
     <Grid>
         <Grid.RowDefinitions>
             <!-- Border -->
@@ -45,6 +161,7 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Grid.Row="0" Content="Load File" Margin="5, 20"
+                    Style="{StaticResource PDLButton}"
                     Command="{Binding LoadFileCommand}"
                     IsEnabled="{Binding LoadEnabled}"/>
 
@@ -105,17 +222,20 @@
                 
                 <!-- Start button -->
                 <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
+                        Style="{StaticResource PDLButton}"
                         Content="{Binding StartButtonText, FallbackValue='Start'}"
                         Command="{Binding StartCommand}" 
-                        IsEnabled="{Binding StartEnabled}" />
+                        IsEnabled="{Binding StartEnabled, FallbackValue=false}" />
                 <!-- Reset button -->
                 <Button Grid.Row="2" Grid.Column="1" Content="Reset" Margin="5"
+                        Style="{StaticResource PDLButton}"
                         Command="{Binding ResetCommand}"
-                        IsEnabled="{Binding ResetEnabled}" />
+                        IsEnabled="{Binding ResetEnabled, FallbackValue=false}" />
                 <!-- Stop button -->
                 <Button Grid.Row="2" Grid.Column="2" Content="Stop" Margin="5"
+                        Style="{StaticResource PDLButton}"
                         Command="{Binding StopCommand}"
-                        IsEnabled="{Binding StopEnabled}"/>
+                        IsEnabled="{Binding StopEnabled, FallbackValue=false}"/>
                 
             </Grid>
 
@@ -172,6 +292,7 @@
 
                 <!-- Export button -->
                 <Button Grid.Row="1" Content="Export" Margin="5 3"
+                        Style="{StaticResource PDLButton}"
                         Command="{Binding ExportSuccessfulCommand}"
                         IsEnabled="{Binding SuccessfulExportEnabled}"/>
             </Grid>
@@ -208,11 +329,13 @@
 
                 <!-- Export button -->
                 <Button Grid.Row="1" Content="Export" Margin="5 3"
+                        Style="{StaticResource PDLButton}"
                         Command="{Binding ExportFailedCommand}"
                         IsEnabled="{Binding FailedExportEnabled}" />
 
                 <!-- Export All button -->
                 <Button Grid.Row="3" Content="Export All" Margin="5 3"
+                        Style="{StaticResource PDLButton}"
                         Command="{Binding ExportAllCommand}"
                         IsEnabled="{Binding ExportAllEnabled}" />
 
