@@ -227,7 +227,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Status text -->
-                <TextBlock Text="Select File" VerticalAlignment="Center" 
+                <TextBlock Text="{Binding StatusText, FallbackValue='Select File'}" VerticalAlignment="Center" 
                            HorizontalAlignment="Center"/>
                 
                 <!-- The progress bar control -->

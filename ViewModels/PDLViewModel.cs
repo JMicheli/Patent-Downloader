@@ -144,6 +144,26 @@ namespace PDL4.ViewModels
             set { }
         }
 
+        public string StatusText
+        {
+            get
+            {
+                if (mAppModel.State == PDLAppState.Initial)
+                    return "Select File";
+                else if (mAppModel.State == PDLAppState.Loaded)
+                    return "Not Started";
+                else if (mAppModel.State == PDLAppState.Stopped)
+                    return "Stopped";
+                else
+                {
+                    int numer = mAppModel.SuccessfulList.Count + mAppModel.FailedList.Count;
+                    int denom = mAppModel.PatentList.Count;
+
+                    return numer.ToString() + "/" + denom.ToString();
+                }
+            }
+        }
+
         #endregion
 
         #region Commands
@@ -178,6 +198,7 @@ namespace PDL4.ViewModels
                 OnPropertyChanged(nameof(SuccessfulDownloads));
                 OnPropertyChanged(nameof(FailedDownloads));
                 OnPropertyChanged(nameof(ProgressBarPercentage));
+                OnPropertyChanged(nameof(StatusText));
             };
             mAppModel.StateChangedCallback = NotifyAll;
 
@@ -302,6 +323,7 @@ namespace PDL4.ViewModels
             OnPropertyChanged(nameof(StartButtonText));
             //Progress bar
             OnPropertyChanged(nameof(ProgressBarPercentage));
+            OnPropertyChanged(nameof(StatusText));
         }
 
         #endregion
