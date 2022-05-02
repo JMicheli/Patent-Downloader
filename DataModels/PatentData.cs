@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace PDL4.DataModels
 {
@@ -34,6 +35,9 @@ namespace PDL4.DataModels
             pat_str = pat_str.Replace(" ", ""); pat_str = pat_str.Replace("-", "");
             pat_str = pat_str.Replace(".", ""); pat_str = pat_str.Replace("/", "");
             pat_str = pat_str.Replace("\n", ""); pat_str = pat_str.Replace("\t", "");
+
+            // Remove unicode special characters
+            pat_str = Regex.Replace(pat_str, @"[^\u0000-\u007F]+", string.Empty);
 
             //Determine country code
             string cc = "US"; //Assume US unless there is a code in the input
