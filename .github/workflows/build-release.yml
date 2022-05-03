@@ -76,6 +76,10 @@ jobs:
           name: prod-artifact
           path: artifact
 
+      - name: Review artifact
+        run: |
+          ls artifact
+
       - name: Upload release artifact
         uses: actions/upload-release-asset@v1
         id: upload-release-asset 
@@ -83,6 +87,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifact
+          asset_path: artifact/prod-artifact.zip 
           asset_name: Patent-Downloader${{ github.ref }}.zip
           asset_content_type: application/zip
