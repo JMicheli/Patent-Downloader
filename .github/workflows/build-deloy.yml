@@ -12,7 +12,7 @@ jobs:
     # Matrix definition
     strategy:
       matrix:
-        channel: [Dev, Prod]
+        channel: [Prod]
         targetPlatform: [x86, x64]
         include:
           # Prod matrix leg
@@ -32,7 +32,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '4.7.2'
+          dotnet-version: '6.0.x'
 
         # Add  MsBuild to the PATH: (see https://github.com/microsoft/setup-msbuild)
       - name: Setup MSBuild.exe
@@ -48,7 +48,6 @@ jobs:
       # Build the solution
       - name: Build the solution for ${{ matrix.ChannelName }}
         run: msbuild $env:Solution_Path /p:Platform=$env:TargetPlatform /p:Configuration=$env:Configuration
-        if: matrix.ChannelName != 'Prod_Store'
         env:
           Configuration: ${{ matrix.Configuration }}
           TargetPlatform: ${{ matrix.targetplatform }}
