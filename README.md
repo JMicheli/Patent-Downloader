@@ -34,3 +34,5 @@ Build
 `dotnet build --configuration Release`
 
 The output will be located in `PDL/bin/Release/`.
+
+© Joseph W. Micheli 2021, all rights reserved. See `license.txt` for further information.
