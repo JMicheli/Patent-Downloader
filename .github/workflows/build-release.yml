@@ -60,11 +60,13 @@ jobs:
       - name: Create release
         uses: actions/create-release@v1
         id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          draft: true # CHANGE THIS LATER
-          prerelease: false
+          draft: false 
+          prerelease: true
           release_name: ${{ github.ref }}
-          tag_name: ${{ github.ref }}
+          tag_name: release-${{ github.sha }}
           body_path: CHANGELOG.md
 
       - name: Download artifact
