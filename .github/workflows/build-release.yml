@@ -1,7 +1,7 @@
-name: Build and Deploy
+name: Build release
 
 on:
-  push:
+  release:
     branches:
       - main
 
@@ -51,13 +51,6 @@ jobs:
   # Release the application
   release:
     needs: build-prod
-
-    # Only happens when a commit with a tag like v1.0 v2.4.1 etc. is pushed.
-    on:
-      push:
-        tags:
-        - 'v*'
-
     runs-on: ubuntu-latest
     
     steps:
