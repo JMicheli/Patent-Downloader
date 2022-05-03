@@ -1,9 +1,11 @@
 name: Build release
 
 on:
-  release:
+  push:
     branches:
       - main
+    tags:
+      - 'v*'
 
 jobs:
 
