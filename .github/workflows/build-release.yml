@@ -51,7 +51,7 @@ jobs:
   # Release the application
   release:
     needs: build-prod
-    permissions: read-all|write-all
+    permissions: write-all
     runs-on: ubuntu-latest
     
     steps:
