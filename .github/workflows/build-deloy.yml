@@ -12,13 +12,13 @@ jobs:
     # Matrix definition
     strategy:
       matrix:
-      channel: [Dev, Prod]
-      targetPlatform: [x86, x64]
-      include:
-        # Prod matrix leg
-        - channel: Prod
-          ChannelName: Prod
-          Configuration: Release
+        channel: [Dev, Prod]
+        targetPlatform: [x86, x64]
+        include:
+          # Prod matrix leg
+          - channel: Prod
+            ChannelName: Prod
+            Configuration: Release
 
     env:
       Solution_Path: PDL4.sln
