@@ -1,0 +1,54 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    # Matrix definition
+    strategy:
+      matrix:
+      channel: [Dev, Prod]
+      targetPlatform: [x86, x64]
+      include:
+        # Prod matrix leg
+        - channel: Prod
+          ChannelName: Prod
+          Configuration: Release
+
+    env:
+      Solution_Path: PDL4.sln
+      PDL_Project_Path: PDL4\PDL4.csproj
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Install the .NET Core workload (see https://github.com/actions/setup-dotnet)
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '4.7.2'
+
+        # Add  MsBuild to the PATH: (see https://github.com/microsoft/setup-msbuild)
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v1.1
+      
+      # Restore the application
+      - name:  Restore the WPF application to populate the obj folder
+        run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
+        env:
+          Configuration: Debug
+          RuntimeIdentifier: win-${{ matrix.targetplatform }}
+
+      # Build the solution
+      - name: Build the solution for ${{ matrix.ChannelName }}
+        run: msbuild $env:Solution_Path /p:Platform=$env:TargetPlatform /p:Configuration=$env:Configuration
+        if: matrix.ChannelName != 'Prod_Store'
+        env:
+          Configuration: ${{ matrix.Configuration }}
+          TargetPlatform: ${{ matrix.targetplatform }}
