@@ -6,19 +6,11 @@ on:
       - main
 
 jobs:
-  build:
+
+  # Build the application
+  build-prod:
     runs-on: windows-latest
     
-    # Matrix definition
-    strategy:
-      matrix:
-        channel: [Prod]
-        include:
-          # Prod matrix leg
-          - channel: Prod
-            ChannelName: Prod
-            Configuration: Release
-
     env:
       Solution_Path: PDL4.sln
       PDL_Project_Path: PDL4\PDL4.csproj
@@ -44,14 +36,57 @@ jobs:
           Configuration: Release
 
       # Build the solution
-      - name: Build the solution (${{ matrix.ChannelName }})
+      - name: Build for production
         run: msbuild $env:Solution_Path /p:Configuration=$env:Configuration
         env:
-          Configuration: ${{ matrix.Configuration }}
+          Configuration: Release
 
       # Upload artifact
-      - name: Upload build artifact (${{ matrix.ChannelName }})
+      - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.Configuration }}-artifact
+          name: prod-artifact
           path: PDL4/bin/Release/
+  
+  # Release the application
+  release:
+    needs: build-prod
+
+    # Only happens when a commit with a tag like v1.0 v2.4.1 etc. is pushed.
+    on:
+      push:
+        tags:
+        - 'v*'
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: true # CHANGE THIS LATER
+          prerelease: false
+          release_name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          body_path: CHANGELOG.md
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: prod-artifact
+          path: artifact/
+
+      - name: Upload release artifact
+        uses: actions/upload-release-asset@v1
+        id: upload-release-asset 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /artifact/prod-artifact.zip
+          asset_name: Patent-Downloader${{ github.ref }}.zip
+          asset_content_type: application/zip
