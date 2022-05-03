@@ -12,8 +12,8 @@ jobs:
     runs-on: windows-latest
     
     env:
-      Solution_Path: PDL4.sln
-      PDL_Project_Path: PDL4\PDL4.csproj
+      Solution_Path: PDL.sln
+      PDL_Project_Path: PDL\PDL.csproj
 
     steps:
       - name: Checkout Code
@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: prod-artifact
-          path: PDL4/bin/Release/
+          path: PDL/bin/Release/
   
   # Release the application
   release:

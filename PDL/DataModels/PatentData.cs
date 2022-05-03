@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace PDL4.DataModels
+namespace PDL.DataModels
 {
     class PatentData
     {

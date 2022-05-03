@@ -6,10 +6,10 @@ using System.Collections.Generic;
 
 using HtmlAgilityPack;
 
-using PDL4.DataModels;
+using PDL.DataModels;
 using System.Threading.Tasks;
 
-namespace PDL4.Models
+namespace PDL.Models
 {
     /// <summary>
     /// A class which handles the download operations for the App,

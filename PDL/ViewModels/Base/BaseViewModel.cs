@@ -1,7 +1,7 @@
 ﻿using PropertyChanged;
 using System.ComponentModel;
 
-namespace PDL4.ViewModels
+namespace PDL.ViewModels
 {
     /// <summary>
     /// A standard base class for viewmodels, implements property change event interface.

@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Collections.Generic;
 
-using PDL4.DataModels;
+using PDL.DataModels;
 
-namespace PDL4.Models
+namespace PDL.Models
 {
     /// <summary>
     /// Enum representing the current state of the application

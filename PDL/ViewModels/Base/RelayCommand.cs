@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace PDL4.ViewModels
+namespace PDL.ViewModels
 {
     /// <summary>
     /// For passing commands in from XAML

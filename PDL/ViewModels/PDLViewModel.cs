@@ -4,10 +4,10 @@ using System.Windows;
 using System.Windows.Input;
 using System.Collections.Generic;
 
-using PDL4.DataModels;
-using PDL4.Models;
+using PDL.DataModels;
+using PDL.Models;
 
-namespace PDL4.ViewModels
+namespace PDL.ViewModels
 {
     /// <summary>
     /// A ViewModel linking the WPF UI to the PDL App classes

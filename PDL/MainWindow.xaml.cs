@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 
-using PDL4.ViewModels;
+using PDL.ViewModels;
 
-namespace PDL4
+namespace PDL
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

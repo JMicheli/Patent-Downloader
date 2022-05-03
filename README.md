@@ -33,4 +33,4 @@ Build
 
 `dotnet build --configuration Release`
 
-The output will be located in `PDL4/bin/Release/`.
+The output will be located in `PDL/bin/Release/`.
