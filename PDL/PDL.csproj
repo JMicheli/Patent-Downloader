@@ -133,9 +133,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\shorechan.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\Favicon\favicon.ico" />
     <Resource Include="Images\Favicon\favicon.png" />
   </ItemGroup>

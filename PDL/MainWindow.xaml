@@ -156,8 +156,6 @@
                 <ColumnDefinition Width="*" />
                 <!-- Download Controls -->
                 <ColumnDefinition Width="100" />
-                <!-- Logo -->
-                <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Grid.Row="0" Content="Load File" Margin="5, 20"
@@ -226,7 +224,7 @@
                     <!-- Border -->
                     <RowDefinition Height="15" />
                 </Grid.RowDefinitions>
-                
+
                 <!-- Start button -->
                 <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
                         Style="{StaticResource PDLButton}"
@@ -243,11 +241,8 @@
                         Style="{StaticResource PDLButton}"
                         Command="{Binding StopCommand}"
                         IsEnabled="{Binding StopEnabled, FallbackValue=false}"/>
-                
-            </Grid>
 
-            <!-- Logo -->
-            <Image Grid.Column="3" Source="Images/shorechan.png" />
+            </Grid>
 
         </Grid>
 
